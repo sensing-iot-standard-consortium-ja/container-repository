@@ -1,5 +1,7 @@
 <template>
-  <span>hoge</span>
+  <div class="block">
+    hoge
+  </div>
 </template>
 
 <script lang="ts">
