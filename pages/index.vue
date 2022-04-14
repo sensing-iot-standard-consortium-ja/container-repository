@@ -1,5 +1,5 @@
 <template>
-  <Tutorial/>
+  <SchemaEditor />
 </template>
 
 <script lang="ts">
