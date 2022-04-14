@@ -1,5 +1,5 @@
 export default {
-  serverMiddleware: ['~/api'],
+  serverMiddleware: ['~/registry'],
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'iot-registory',
