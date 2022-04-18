@@ -30,7 +30,7 @@
             <h2>Info</h2>
             <div class="offset">
                 <div class="hex">0x{{offset.toString(16).padStart(8,'0')}} : 0x{{size.toString(16).padStart(8,'0')}} bytes</div>
-                <div class="dec">&nbsp;&nbsp;{{offset.toString().padStart(8,'0')}} : {{size.toString().padStart(8,'0')}} bytes</div>
+                <div class="dec">&nbsp;&nbsp;{{offset.toString().padStart(8,'0')}} : &nbsp;&nbsp;{{size.toString().padStart(8,'0')}} bytes</div>
             </div>
             <h2>Data Interpreter</h2>
             <form class="settings">
@@ -483,7 +483,6 @@ html,
 body,
 #app {
   width: 100%;
-  height: 100%;
   display: flex;
   font-family: monospace;
   font-size: 1rem;
@@ -537,7 +536,6 @@ input[type="file"] {
 .values,
 .interpreter {
   width: 100%;
-  height: 100%;
 }
 .offsets {
   background: #222;
