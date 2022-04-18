@@ -261,6 +261,15 @@ export default {
     isLineActive(lineIndex) {
       return lineIndex === this.row.current - this.row.start
     },
+    toTimestampString(number){
+      try{
+        return new Date(number).toISOString()
+      }
+      catch(error){
+        // do nothing...
+        return "invalid timestamp"
+      }
+    },
     updateInterpreter() {
       this.interpreter.u8 = 0
       this.interpreter.i8 = 0
@@ -297,10 +306,10 @@ export default {
         this.interpreter.i32be = this.dataView.getInt32(this.offset, false)
         this.interpreter.f32le = this.dataView.getFloat32(this.offset, true)
         this.interpreter.f32be = this.dataView.getFloat32(this.offset, true)
-        this.interpreter.tu32le = new Date(this.dataView.getUint32(this.offset, true))
-        this.interpreter.tu32be = new Date(this.dataView.getUint32(this.offset, false))
-        this.interpreter.tf32le = new Date(this.dataView.getFloat32(this.offset, true))
-        this.interpreter.tf32be = new Date(this.dataView.getFloat32(this.offset, false))
+        this.interpreter.tu32le = this.toTimestampString(this.dataView.getUint32(this.offset, true))
+        this.interpreter.tu32be = this.toTimestampString(this.dataView.getUint32(this.offset, false))
+        this.interpreter.tf32le = this.toTimestampString(this.dataView.getFloat32(this.offset, true))
+        this.interpreter.tf32be = this.toTimestampString(this.dataView.getFloat32(this.offset, false))
       }
       this.interpreter.f64le = 0
       this.interpreter.f64be = 0
@@ -309,8 +318,8 @@ export default {
       if(this.offset + 8 <= this.dataView.byteLength){
         this.interpreter.f64le = this.dataView.getFloat64(this.offset, true)
         this.interpreter.f64be = this.dataView.getFloat64(this.offset, true)
-        this.interpreter.tf64le = new Date(this.dataView.getFloat64(this.offset, true))
-        this.interpreter.tf64be = new Date(this.dataView.getFloat64(this.offset, false))
+        this.interpreter.tf64le = this.toTimestampString(this.dataView.getFloat64(this.offset, true))
+        this.interpreter.tf64be = this.toTimestampString(this.dataView.getFloat64(this.offset, false))
       }
     },
     loadFile(file) {
