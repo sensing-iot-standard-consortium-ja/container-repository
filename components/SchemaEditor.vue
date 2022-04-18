@@ -1,5 +1,6 @@
 <template>
-  <div id="app" @drag="handleDrag"
+  <div id="app" tabIndex="1"
+  @drag="handleDrag"
   @dragstart="handleDrag"
   @dragenter="handleDrag"
   @dragexit="handleDrag"
@@ -28,8 +29,8 @@
         <div class="interpreter" title="Data interpreter">
             <h2>Info</h2>
             <div class="offset">
-                <div class="hex">{{offset.toString(16).padStart(8,'0')}} : {{size.toString(16).padStart(8,'0')}} bytes</div>
-                <div class="dec">{{offset.toString().padStart(8,'0')}} : {{size.toString().padStart(8,'0')}} bytes</div>
+                <div class="hex">0x{{offset.toString(16).padStart(8,'0')}} : 0x{{size.toString(16).padStart(8,'0')}} bytes</div>
+                <div class="dec">&nbsp;&nbsp;{{offset.toString().padStart(8,'0')}} : {{size.toString().padStart(8,'0')}} bytes</div>
             </div>
             <h2>Data Interpreter</h2>
             <form class="settings">
@@ -43,11 +44,6 @@
                         <legend>Signedness</legend>
                         <div class="group"><input id="unsigned" type="checkbox" v-model="settings.u" /><label id="unsigned-label" for="unsigned">Show unsigned</label></div>
                         <div class="group"><input id="signed" type="checkbox" v-model="settings.i" /><label id="signed-label" for="signed">Show signed</label></div>
-                    </fieldset>
-                    <fieldset class="setting colorize">
-                        <legend>Colorize</legend>
-                        <div class="group"><input id="colorize" type="checkbox" v-model="settings.colorize.enabled" /><label id="colorize-label" for="colorize">Colorize</label></div>
-                        <div class="group"><input id="colorize-palette" type="file" @change="handlePalette" /><label class="button" id="colorize-palette-label" for="colorize-palette">Load Palette</label></div>
                     </fieldset>
                 </div>
             </form>
@@ -65,7 +61,7 @@
                 <tr class="i8" title="8-bit signed int" v-if="settings.i">
                     <td class="type">i8</td>
                     <td class="value">{{interpreter.i8}}</td>
-                    <td class="binary">{{interpreter.i8.toString(2).padStart(8,'0')}}</td>
+                    <td class="binary">{{interpreter.u8.toString(2).padStart(8,'0')}}</td>
                 </tr>
                 <tr class="u16le" title="16-bit little endian unsigned int" v-if="settings.u &amp;&amp; settings.le">
                     <td class="type">u16le</td>
@@ -75,7 +71,7 @@
                 <tr class="i16le" title="16-bit little endian signed int" v-if="settings.i &amp;&amp; settings.le">
                     <td class="type">i16le</td>
                     <td class="value">{{interpreter.i16le}}</td>
-                    <td class="binary">{{interpreter.i16le.toString(2).padStart(16,'0')}}</td>
+                    <td class="binary">{{interpreter.u16le.toString(2).padStart(16,'0')}}</td>
                 </tr>
                 <tr class="u16be" title="16-bit big endian unsigned int" v-if="settings.u &amp;&amp; settings.be">
                     <td class="type">u16be</td>
@@ -85,7 +81,7 @@
                 <tr class="i16be" title="16-bit big endian signed int" v-if="settings.i &amp;&amp; settings.be">
                     <td class="type">i16be</td>
                     <td class="value">{{interpreter.i16be}}</td>
-                    <td class="binary">{{interpreter.i16be.toString(2).padStart(16,'0')}}</td>
+                    <td class="binary">{{interpreter.u16be.toString(2).padStart(16,'0')}}</td>
                 </tr>
                 <tr class="u32le" title="32-bit little endian unsigned int" v-if="settings.u &amp;&amp; settings.le">
                     <td class="type">u32le</td>
@@ -95,7 +91,7 @@
                 <tr class="i32le" title="32-bit little endian signed int" v-if="settings.i &amp;&amp; settings.le">
                     <td class="type">i32le</td>
                     <td class="value">{{interpreter.i32le}}</td>
-                    <td class="binary">{{interpreter.i32le.toString(2).padStart(32,'0')}}</td>
+                    <td class="binary">{{interpreter.u32le.toString(2).padStart(32,'0')}}</td>
                 </tr>
                 <tr class="u32be" title="32-bit big endian unsigned int" v-if="settings.u &amp;&amp; settings.be">
                     <td class="type">u32be</td>
@@ -105,7 +101,7 @@
                 <tr class="i32be" title="32-bit big endian signed int" v-if="settings.i &amp;&amp; settings.be">
                     <td class="type">i32be</td>
                     <td class="value">{{interpreter.i32be}}</td>
-                    <td class="binary">{{interpreter.i32be.toString(2).padStart(32,'0')}}</td>
+                    <td class="binary">{{interpreter.u32be.toString(2).padStart(32,'0')}}</td>
                 </tr>
                 <tr class="f32le" title="32-bit little endian float" v-if="settings.le">
                     <td class="type">f32le</td>
@@ -266,43 +262,62 @@ export default {
       return lineIndex === this.row.current - this.row.start
     },
     updateInterpreter() {
-      this.interpreter.u8 = this.dataView.getUint8(this.offset)
-      this.interpreter.i8 = this.dataView.getInt8(this.offset)
+      this.interpreter.u8 = 0
+      this.interpreter.i8 = 0
+      if (this.offset + 1 <= this.dataView.byteLength){
+        this.interpreter.u8 = this.dataView.getUint8(this.offset)
+        this.interpreter.i8 = this.dataView.getInt8(this.offset)
+      }
 
-      this.interpreter.u16le = this.dataView.getUint16(this.offset, true)
-      this.interpreter.i16le = this.dataView.getInt16(this.offset, true)
-      this.interpreter.u16be = this.dataView.getUint16(this.offset, false)
-      this.interpreter.i16be = this.dataView.getInt16(this.offset, false)
+      this.interpreter.u16le = 0
+      this.interpreter.i16le = 0
+      this.interpreter.u16be = 0
+      this.interpreter.i16be = 0
+      if(this.offset + 2 <= this.dataView.byteLength){
+        this.interpreter.u16le = this.dataView.getUint16(this.offset, true)
+        this.interpreter.i16le = this.dataView.getInt16(this.offset, true)
+        this.interpreter.u16be = this.dataView.getUint16(this.offset, false)
+        this.interpreter.i16be = this.dataView.getInt16(this.offset, false)
+      }
 
-      this.interpreter.u32le = this.dataView.getUint32(this.offset, true)
-      this.interpreter.i32le = this.dataView.getInt32(this.offset, true)
-      this.interpreter.u32be = this.dataView.getUint32(this.offset, false)
-      this.interpreter.i32be = this.dataView.getInt32(this.offset, false)
-
-      this.interpreter.f32le = this.dataView.getFloat32(this.offset, true)
-      this.interpreter.f32be = this.dataView.getFloat32(this.offset, true)
-
-      this.interpreter.f64le = this.dataView.getFloat64(this.offset, true)
-      this.interpreter.f64be = this.dataView.getFloat64(this.offset, true)
-
-      this.interpreter.tu32le = new Date(this.dataView.getUint32(this.offset, true))
-      this.interpreter.tu32be = new Date(this.dataView.getUint32(this.offset, false))
-
-      this.interpreter.tf32le = new Date(this.dataView.getFloat32(this.offset, true))
-      this.interpreter.tf32be = new Date(this.dataView.getFloat32(this.offset, false))
-      this.interpreter.tf64le = new Date(this.dataView.getFloat64(this.offset, true))
-      this.interpreter.tf64be = new Date(this.dataView.getFloat64(this.offset, false))
+      this.interpreter.u32le = 0
+      this.interpreter.i32le = 0
+      this.interpreter.u32be = 0
+      this.interpreter.i32be = 0
+      this.interpreter.f32le = 0
+      this.interpreter.f32be = 0
+      this.interpreter.tu32le = 0
+      this.interpreter.tu32be = 0
+      this.interpreter.tf32le = 0
+      this.interpreter.tf32be = 0
+      if(this.offset + 4 <= this.dataView.byteLength){
+        this.interpreter.u32le = this.dataView.getUint32(this.offset, true)
+        this.interpreter.i32le = this.dataView.getInt32(this.offset, true)
+        this.interpreter.u32be = this.dataView.getUint32(this.offset, false)
+        this.interpreter.i32be = this.dataView.getInt32(this.offset, false)
+        this.interpreter.f32le = this.dataView.getFloat32(this.offset, true)
+        this.interpreter.f32be = this.dataView.getFloat32(this.offset, true)
+        this.interpreter.tu32le = new Date(this.dataView.getUint32(this.offset, true))
+        this.interpreter.tu32be = new Date(this.dataView.getUint32(this.offset, false))
+        this.interpreter.tf32le = new Date(this.dataView.getFloat32(this.offset, true))
+        this.interpreter.tf32be = new Date(this.dataView.getFloat32(this.offset, false))
+      }
+      this.interpreter.f64le = 0
+      this.interpreter.f64be = 0
+      this.interpreter.tf64le = 0
+      this.interpreter.tf64be = 0
+      if(this.offset + 8 <= this.dataView.byteLength){
+        this.interpreter.f64le = this.dataView.getFloat64(this.offset, true)
+        this.interpreter.f64be = this.dataView.getFloat64(this.offset, true)
+        this.interpreter.tf64le = new Date(this.dataView.getFloat64(this.offset, true))
+        this.interpreter.tf64be = new Date(this.dataView.getFloat64(this.offset, false))
+      }
     },
     loadFile(file) {
       const fr = new FileReader()
       fr.addEventListener('load', this.handleFile)
       fr.addEventListener('error', this.handleFile)
       fr.readAsArrayBuffer(file)
-    },
-    handlePalette(e) {
-      const files = e.target.files
-      const [file] = files
-      //this.loadPalette(file)
     },
     handleOpenFile(e) {
       const files = e.target.files
