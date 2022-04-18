@@ -10,19 +10,24 @@
   @drop="handleDrag"
   @keydown="handleKey">
     <div class="drag" v-if="!dataView">
-        <div class="open-file"><input class="open-file-input" id="file" type="file" name="file" @change="handleOpenFile" /><label class="open-file-label" for="file">Drag and drop a file into this area or click here</label></div>
+        <div class="open-file">
+            <input class="open-file-input" id="file" type="file" name="file" @change="handleOpenFile" />
+            <label class="open-file-label" for="file">
+              Drag and drop a file into this area or click here
+            </label>
+        </div>
     </div>
     <div class="file" v-if="dataView">
         <div class="offsets" title="Offset">
-            <div class="offset" v-for="(offset, lineIndex) of offsets" :key="lineIndex" :class="{ 'active': isLineActive(lineIndex) }" @click="handleLineClick(lineIndex, $event)">{{offset}}</div>
+            <div class="offset" v-for="(offset, lineIndex) of offsets" :key="lineIndex" :class="{ 'active': isLineActive(lineIndex) }" @click.prevent="handleLineClick(lineIndex, $event)">{{offset}}</div>
         </div>
         <div class="lines hex" title="Hex value">
-            <div class="line" v-for="(line, lineIndex) of hex" :key="lineIndex" :class="{ 'active': isLineActive(lineIndex) }" @click="handleLineClick(lineIndex, $event)">
+            <div class="line" v-for="(line, lineIndex) of hex" :key="lineIndex" :class="{ 'active': isLineActive(lineIndex) }" @click.prevent="handleLineClick(lineIndex, $event)">
                 <div class="value" v-for="(value, valueIndex) of line" :key="(lineIndex * 16) + valueIndex" :class="{ 'active': isValueActive(lineIndex, valueIndex) }" @click="handleValueClick(valueIndex, $event)">{{value}}</div>
             </div>
         </div>
         <div class="lines ascii" title="Ascii value">
-            <div class="line" v-for="(line, lineIndex) of ascii" :key="lineIndex" :class="{ 'active': isLineActive(lineIndex) }" @click="handleLineClick(lineIndex, $event)">
+            <div class="line" v-for="(line, lineIndex) of ascii" :key="lineIndex" :class="{ 'active': isLineActive(lineIndex) }" @click.prevent="handleLineClick(lineIndex, $event)">
                 <div class="value" v-for="(value, valueIndex) of line" :key="(lineIndex * 16) + valueIndex" :class="{ 'active': isValueActive(lineIndex, valueIndex) }" @click="handleValueClick(valueIndex, $event)">{{value}}</div>
             </div>
         </div>
@@ -338,6 +343,7 @@ export default {
     },
     handleLineClick(lineIndex, e) {
       this.goToLineRelative(lineIndex)
+      this.updateInterpreter()
     },
     handleKey(e) {
       if (e.code === 'ArrowUp' || e.key === 'k') {
