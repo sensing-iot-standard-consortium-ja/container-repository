@@ -69,7 +69,9 @@
             v-for="(value, valueIndex) of line"
             :key="lineIndex * 16 + valueIndex"
             class="value"
-            :class="{ active: isValueActive(lineIndex, valueIndex) }"
+            :class="{
+              active: isValueActive(lineIndex, valueIndex),
+            }"
             @click="handleValueClick(valueIndex, $event)"
           >
             {{ value }}
@@ -343,29 +345,7 @@
           >
             <td class="type">tf32be</td>
             <td class="value">
-              {{ interpreter.tf64be }}
-            </td>
-            <td class="binary">--</td>
-          </tr>
-          <tr
-            v-if="settings.le"
-            class="tf64le"
-            title="64-bit little endian time (float 64)"
-          >
-            <td class="type">tf64le</td>
-            <td class="value">
-              {{ interpreter.tf64le }}
-            </td>
-            <td class="binary">--</td>
-          </tr>
-          <tr
-            v-if="settings.be"
-            class="tf64be"
-            title="64-bit big endian time (float 64)"
-          >
-            <td class="type">tf64be</td>
-            <td class="value">
-              {{ interpreter.tf64be }}
+              {{ interpreter.tf32be }}
             </td>
             <td class="binary">--</td>
           </tr>
@@ -432,8 +412,6 @@ export default {
         tu32be: 0,
         tf32le: 0,
         tf32be: 0,
-        tf64le: 0,
-        tf64be: 0,
         binary: 0,
         hex: 0,
       },
@@ -629,17 +607,9 @@ export default {
       }
       this.interpreter.f64le = 0;
       this.interpreter.f64be = 0;
-      this.interpreter.tf64le = 0;
-      this.interpreter.tf64be = 0;
       if (this.offset + 8 <= this.dataView.byteLength) {
         this.interpreter.f64le = this.dataView.getFloat64(this.offset, true);
         this.interpreter.f64be = this.dataView.getFloat64(this.offset, true);
-        this.interpreter.tf64le = this.toTimestampString(
-          this.dataView.getFloat64(this.offset, true)
-        );
-        this.interpreter.tf64be = this.toTimestampString(
-          this.dataView.getFloat64(this.offset, false)
-        );
       }
     },
     loadFile(file) {
@@ -963,13 +933,5 @@ input[type="file"] {
 .interpreter .tf32le .value,
 .interpreter .tf32be .value {
   color: #a6a6d9;
-}
-.interpreter .tf64le .type,
-.interpreter .tf64be .type {
-  color: #9970c2;
-}
-.interpreter .tf64le .value,
-.interpreter .tf64be .value {
-  color: #bfa6d9;
 }
 </style>
