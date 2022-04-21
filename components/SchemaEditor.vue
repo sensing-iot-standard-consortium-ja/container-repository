@@ -96,7 +96,7 @@
         <form class="settings">
           <div class="settings-row">
             <fieldset class="setting endian">
-              <legend>Endianness</legend>
+              <legend>Byte Order</legend>
               <div class="group">
                 <input
                   id="little-endian"
@@ -137,19 +137,28 @@
             </fieldset>
           </div>
         </form>
-        <table>
+        <table
+          :class="{
+            hexmode: settings.radixmode == 16,
+            binmode: settings.radixmode == 2,
+          }"
+        >
           <tr>
             <th>type</th>
             <th>value</th>
-            <th>binary</th>
+            <th @click="togglePreview">
+              <span class="show_hexmode">hex</span>
+              ↔️
+              <span class="show_binmode">binary</span>
+            </th>
           </tr>
           <tr v-if="settings.u" class="u8" title="8-bit unsigned int">
             <td class="type">u8</td>
             <td class="value">
               {{ interpreter.u8 }}
             </td>
-            <td class="binary">
-              {{ interpreter.u8.toString(2).padStart(8, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u8, 1) }}</span>
             </td>
           </tr>
           <tr v-if="settings.i" class="i8" title="8-bit signed int">
@@ -157,8 +166,8 @@
             <td class="value">
               {{ interpreter.i8 }}
             </td>
-            <td class="binary">
-              {{ interpreter.u8.toString(2).padStart(8, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u8, 1) }}</span>
             </td>
           </tr>
           <tr
@@ -170,8 +179,8 @@
             <td class="value">
               {{ interpreter.u16le }}
             </td>
-            <td class="binary">
-              {{ interpreter.u16le.toString(2).padStart(16, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u16le, 2) }}</span>
             </td>
           </tr>
           <tr
@@ -183,8 +192,8 @@
             <td class="value">
               {{ interpreter.i16le }}
             </td>
-            <td class="binary">
-              {{ interpreter.u16le.toString(2).padStart(16, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u16le, 2) }}</span>
             </td>
           </tr>
           <tr
@@ -196,8 +205,8 @@
             <td class="value">
               {{ interpreter.u16be }}
             </td>
-            <td class="binary">
-              {{ interpreter.u16be.toString(2).padStart(16, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u16be, 2) }}</span>
             </td>
           </tr>
           <tr
@@ -209,8 +218,8 @@
             <td class="value">
               {{ interpreter.i16be }}
             </td>
-            <td class="binary">
-              {{ interpreter.u16be.toString(2).padStart(16, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u16be, 2) }}</span>
             </td>
           </tr>
           <tr
@@ -222,8 +231,8 @@
             <td class="value">
               {{ interpreter.u32le }}
             </td>
-            <td class="binary">
-              {{ interpreter.u32le.toString(2).padStart(32, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
             </td>
           </tr>
           <tr
@@ -235,8 +244,8 @@
             <td class="value">
               {{ interpreter.i32le }}
             </td>
-            <td class="binary">
-              {{ interpreter.u32le.toString(2).padStart(32, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
             </td>
           </tr>
           <tr
@@ -248,8 +257,8 @@
             <td class="value">
               {{ interpreter.u32be }}
             </td>
-            <td class="binary">
-              {{ interpreter.u32be.toString(2).padStart(32, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
             </td>
           </tr>
           <tr
@@ -261,8 +270,8 @@
             <td class="value">
               {{ interpreter.i32be }}
             </td>
-            <td class="binary">
-              {{ interpreter.u32be.toString(2).padStart(32, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
             </td>
           </tr>
           <tr
@@ -274,8 +283,8 @@
             <td class="value">
               {{ interpreter.f32le }}
             </td>
-            <td class="binary">
-              {{ interpreter.u32le.toString(2).padStart(32, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
             </td>
           </tr>
           <tr v-if="settings.be" class="f32be" title="32-bit big endian float">
@@ -283,8 +292,8 @@
             <td class="value">
               {{ interpreter.f32be }}
             </td>
-            <td class="binary">
-              {{ interpreter.u32be.toString(2).padStart(32, "0") }}
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
             </td>
           </tr>
           <tr
@@ -296,14 +305,18 @@
             <td class="value">
               {{ interpreter.f64le }}
             </td>
-            <td class="binary">--</td>
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u64le, 8) }}</span>
+            </td>
           </tr>
           <tr v-if="settings.be" class="f64be" title="64-bit big endian float">
             <td class="type">f64be</td>
             <td class="value">
               {{ interpreter.f64be }}
             </td>
-            <td class="binary">--</td>
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u64be, 8) }}</span>
+            </td>
           </tr>
           <tr
             v-if="settings.le"
@@ -314,7 +327,9 @@
             <td class="value">
               {{ interpreter.tu32le }}
             </td>
-            <td class="binary">--</td>
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
+            </td>
           </tr>
           <tr
             v-if="settings.be"
@@ -325,7 +340,9 @@
             <td class="value">
               {{ interpreter.tu32be }}
             </td>
-            <td class="binary">--</td>
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
+            </td>
           </tr>
           <tr
             v-if="settings.le"
@@ -336,7 +353,9 @@
             <td class="value">
               {{ interpreter.tf32le }}
             </td>
-            <td class="binary">--</td>
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
+            </td>
           </tr>
           <tr
             v-if="settings.be"
@@ -347,7 +366,9 @@
             <td class="value">
               {{ interpreter.tf32be }}
             </td>
-            <td class="binary">--</td>
+            <td class="raw">
+              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
+            </td>
           </tr>
         </table>
       </div>
@@ -392,6 +413,7 @@ export default {
           enabled: false,
           palette: null,
         },
+        radixmode: 16, // hex(16)/bin(2)
       },
       interpreter: {
         u8: 0,
@@ -406,6 +428,10 @@ export default {
         i32be: 0,
         f32le: 0,
         f32be: 0,
+        u64be: 0,
+        i64be: undefined,
+        u64le: 0,
+        i64le: undefined,
         f64le: 0,
         f64be: 0,
         tu32le: 0,
@@ -461,6 +487,19 @@ export default {
     },
   },
   methods: {
+    togglePreview() {
+      if (this.settings.radixmode == 16) this.settings.radixmode = 2;
+      else {
+        this.settings.radixmode = 16;
+      }
+      return;
+    },
+    rawdata_presenter(value, bytelength) {
+      const keta = Math.ceil(
+        (bytelength * 8) / Math.log2(this.settings.radixmode)
+      );
+      return value.toString(this.settings.radixmode).padStart(keta, "0");
+    },
     getRows(fn) {
       if (!this.dataView) {
         return [];
@@ -591,7 +630,7 @@ export default {
         this.interpreter.u32be = this.dataView.getUint32(this.offset, false);
         this.interpreter.i32be = this.dataView.getInt32(this.offset, false);
         this.interpreter.f32le = this.dataView.getFloat32(this.offset, true);
-        this.interpreter.f32be = this.dataView.getFloat32(this.offset, true);
+        this.interpreter.f32be = this.dataView.getFloat32(this.offset, false);
         this.interpreter.tu32le = this.toTimestampString(
           this.dataView.getUint32(this.offset, true)
         );
@@ -607,9 +646,13 @@ export default {
       }
       this.interpreter.f64le = 0;
       this.interpreter.f64be = 0;
+      this.interpreter.u64le = 0;
+      this.interpreter.u64be = 0;
       if (this.offset + 8 <= this.dataView.byteLength) {
+        this.interpreter.u64le = this.dataView.getUint64(this.offset, true);
+        this.interpreter.u64be = this.dataView.getUint64(this.offset, false);
         this.interpreter.f64le = this.dataView.getFloat64(this.offset, true);
-        this.interpreter.f64be = this.dataView.getFloat64(this.offset, true);
+        this.interpreter.f64be = this.dataView.getFloat64(this.offset, false);
       }
     },
     loadFile(file) {
@@ -838,10 +881,22 @@ input[type="file"] {
   width: 100%;
   border-collapse: collapse;
 }
-.interpreter table tr:nth-child(n + 0) td {
+.interpreter table.hexmode tr th > .show_hexmode,
+.interpreter table.binmode tr th > .show_binmode {
+  background: #fbf;
+  color: #373766;
+}
+
+.interpreter table.hexmode tr td.raw > span::before {
+  content: "0x";
+}
+.interpreter table.binmode tr td.raw > span::before {
+  content: "0b";
+}
+.interpreter table tr:nth-child(2n + 0) td {
   padding-top: 1rem;
 }
-.interpreter table tr:nth-child(n + 1) td {
+.interpreter table tr:nth-child(2n + 1) td {
   padding-bottom: 1rem;
   border-bottom: 1px solid #bbb;
 }
