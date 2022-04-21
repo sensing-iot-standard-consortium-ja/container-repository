@@ -550,7 +550,7 @@ export default {
     },
     toTimestampString(number) {
       try {
-        return new Date(number).toISOString();
+        return new Date(number * 1000).toISOString();
       } catch (error) {
         // do nothing...
         return "invalid timestamp";
@@ -838,10 +838,10 @@ input[type="file"] {
   width: 100%;
   border-collapse: collapse;
 }
-.interpreter table tr:nth-child(2n + 0) td {
+.interpreter table tr:nth-child(n + 0) td {
   padding-top: 1rem;
 }
-.interpreter table tr:nth-child(2n + 1) td {
+.interpreter table tr:nth-child(n + 1) td {
   padding-bottom: 1rem;
   border-bottom: 1px solid #bbb;
 }
