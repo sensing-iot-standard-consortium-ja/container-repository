@@ -2,6 +2,7 @@
   <div>
     <DataLoader v-model="dataView" />
     <SchemaEditor :dataView="dataView" />
+    <IotContainer v-model="container" :dataView="dataView" />
   </div>
 </template>
 
@@ -26,6 +27,8 @@ export default {
   data() {
     return {
       dataView: null,
+      container: null,
+      schema: [],
     };
   },
 };
