@@ -10,7 +10,7 @@
     @dragleave="handleDrag"
     @dragover="handleDrag"
     @drop="handleDrag"
-    @keydown="handleKey"
+    @keydown.prevent="handleKey"
   >
     <div v-if="!dataView" class="drag">
       <div class="open-file">
