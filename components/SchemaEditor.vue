@@ -1,31 +1,5 @@
 <template>
-  <div
-    id="app"
-    tabIndex="1"
-    @drag="handleDrag"
-    @dragstart="handleDrag"
-    @dragenter="handleDrag"
-    @dragexit="handleDrag"
-    @dragend="handleDrag"
-    @dragleave="handleDrag"
-    @dragover="handleDrag"
-    @drop="handleDrag"
-    @keydown.prevent="handleKey"
-  >
-    <div v-if="!dataView" class="drag">
-      <div class="open-file">
-        <input
-          id="file"
-          class="open-file-input"
-          type="file"
-          name="file"
-          @change="handleOpenFile"
-        />
-        <label class="open-file-label" for="file">
-          Drag and drop a file into this area or click here
-        </label>
-      </div>
-    </div>
+  <div id="app" tabIndex="1" @keydown.prevent="handleKey">
     <div v-if="dataView" class="file">
       <div class="offsets" title="Offset">
         <div
@@ -377,27 +351,10 @@
 </template>
 <!--https://codepen.io/AzazelN28/pen/mQMapb -->
 <script>
-DataView.prototype.getUint64 = function (byteOffset, littleEndian) {
-  // split 64-bit number into two 32-bit (4-byte) parts
-  const left = this.getUint32(byteOffset, littleEndian);
-  const right = this.getUint32(byteOffset + 4, littleEndian);
-
-  // combine the two 32-bit values
-  const combined = littleEndian
-    ? left + 2 ** 32 * right
-    : 2 ** 32 * left + right;
-
-  if (!Number.isSafeInteger(combined)) {
-    console.warn(combined, "exceeds MAX_SAFE_INTEGER. Precision may be lost");
-  }
-
-  return combined;
-};
-
 export default {
+  props: ["dataView"],
   data() {
     return {
-      dataView: null,
       rowLength: 16,
       row: {
         start: 0,
@@ -443,6 +400,14 @@ export default {
       },
     };
   },
+  watch: {
+    dataView() {
+      this.row.start = 0;
+      this.row.current = 0;
+      this.column = 0;
+      this.updateInterpreter();
+    },
+  },
   computed: {
     size() {
       if (!this.dataView) {
@@ -463,7 +428,8 @@ export default {
       return Math.floor(this.dataView.byteLength / this.rowLength);
     },
     rows() {
-      return Math.ceil(this.$el.clientHeight / 16); // NOTE: This is not the row length (it's the pixel height of each line)
+      // return Math.ceil(this.$el.clientHeight / 16); // NOTE: This is not the row length (it's the pixel height of each line)
+      return 0x20; // 32行分画面に表示する
     },
     offsets() {
       if (!this.dataView) {
@@ -655,17 +621,6 @@ export default {
         this.interpreter.f64be = this.dataView.getFloat64(this.offset, false);
       }
     },
-    loadFile(file) {
-      const fr = new FileReader();
-      fr.addEventListener("load", this.handleFile);
-      fr.addEventListener("error", this.handleFile);
-      fr.readAsArrayBuffer(file);
-    },
-    handleOpenFile(e) {
-      const files = e.target.files;
-      const [file] = files;
-      this.loadFile(file);
-    },
     handleValueClick(valueIndex) {
       this.goToChar(valueIndex);
     },
@@ -703,26 +658,6 @@ export default {
         this.moveLineUp();
       } else {
         this.moveLineDown();
-      }
-    },
-    handleFile(e) {
-      const fr = e.target;
-      const arrayBuffer = fr.result;
-      fr.removeEventListener("load", this.handleFile);
-      fr.removeEventListener("error", this.handleFile);
-      this.dataView = new DataView(arrayBuffer);
-      this.updateInterpreter();
-    },
-    handleDrag(e) {
-      if (e.type === "dragover") {
-        e.preventDefault();
-      } else if (e.type === "drop") {
-        e.preventDefault();
-        this.row.start = 0;
-        this.row.current = 0;
-        this.column = 0;
-        const [file] = e.dataTransfer.files;
-        this.loadFile(file);
       }
     },
   },
@@ -893,12 +828,8 @@ input[type="file"] {
 .interpreter table.binmode tr td.raw > span::before {
   content: "0b";
 }
-.interpreter table tr:nth-child(2n + 0) td {
-  padding-top: 1rem;
-}
 .interpreter table tr:nth-child(2n + 1) td {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #bbb;
+  padding-bottom: 0.8rem;
 }
 .interpreter table tr th {
   border-bottom: 1px solid #bbb;
