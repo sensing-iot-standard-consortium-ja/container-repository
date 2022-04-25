@@ -1,5 +1,5 @@
 <template>
-  <div id="app" tabIndex="1" @keydown.prevent="handleKey">
+  <div id="app" tabIndex="1" @keydown="handleKey">
     <div v-if="dataView" class="file">
       <div class="offsets" title="Offset">
         <div
@@ -53,6 +53,9 @@
         </div>
       </div>
       <div class="interpreter" title="Data interpreter">
+        <h2>Schema Interpreter</h2>
+        <SchemaEditor />
+        <!--
         <h2>Info</h2>
         <div class="offset">
           <div class="hex">
@@ -66,6 +69,7 @@
             &nbsp;&nbsp;{{ size.toString().padStart(8, "0") }} bytes
           </div>
         </div>
+        -->
         <h2>Data Interpreter</h2>
         <form class="settings">
           <div class="settings-row">
@@ -663,7 +667,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 html,
 body,
 #app {
@@ -847,6 +851,7 @@ input[type="file"] {
 .interpreter table tr td:first-child,
 .interpreter table tr th:first-child {
   text-align: right;
+  width: 0em;
 }
 .interpreter .u8 .type,
 .interpreter .i8 .type {
