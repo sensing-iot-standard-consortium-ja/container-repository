@@ -1,3 +1,6 @@
+<template>
+  <span style="visibility: hidden"></span>
+</template>
 <script>
 export default {
   props: ["dataView"],
