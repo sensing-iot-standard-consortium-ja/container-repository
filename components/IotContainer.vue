@@ -1,6 +1,3 @@
-<template>
-  <span></span>
-</template>
 <script>
 export default {
   props: ["dataView"],
@@ -14,25 +11,34 @@ export default {
       if (!this.dataView) {
         return {};
       }
-      const c_type = this.dataView.getUint16(0);
-      const c_length = this.dataView.getUint16(2);
-      const c_data_index = this.dataView.getUint8(4);
-      const c_data_id_length = this.data_id_length(c_data_index);
-      // const c_data_id = this.dataView.getXXXXX(5, c_data_id_length);
-      let ptr = 5 + c_data_id_length;
-      if ([0x6666, 0x0f0f, 0x9999, 0xf0f0].includes(c_type)) {
-        const attr_count = this.dataView.getUint8(ptr);
-        ptr++;
+      const type = this.dataView.getUint16(0);
+      const length = this.dataView.getUint16(2);
+      const data_index = this.dataView.getUint8(4);
+      const _data_id_length = this.data_id_length(data_index);
+
+      let _ptr = 5 + _data_id_length;
+      const data_id = Array.from(
+        new Uint8Array(this.dataView.buffer).slice(5, _ptr)
+      );
+      if ([0x6666, 0x0f0f, 0x9999, 0xf0f0].includes(type)) {
+        const attr_count = this.dataView.getUint8(_ptr);
+        _ptr++;
         for (let i; i < attr_count; i++) {
-          // const attr_id = this.dataView.getUint8(ptr)
-          const attr_len = this.dataView.getUint8(ptr + 1);
-          // const attr_val = this.dataView.getXXXXX(ptr + 2, attr_len)
-          ptr = ptr + 1 + 1 + attr_len;
+          // const attr_id = this.dataView.getUint8(_ptr)
+          const attr_len = this.dataView.getUint8(_ptr + 1);
+          // const attr_val = this.dataView.getXXXXX(_ptr + 2, attr_len)
+          _ptr = _ptr + 1 + 1 + attr_len;
         }
       }
       return {
-        header: { begin: 0, end: ptr },
-        payload: { begin: ptr, end: c_length },
+        header: { begin: 0, end: _ptr },
+        header_fields: {
+          type,
+          length,
+          data_index,
+          data_id,
+        },
+        payload: { begin: _ptr, end: length },
       };
     },
   },
