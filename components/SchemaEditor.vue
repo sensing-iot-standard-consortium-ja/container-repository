@@ -11,13 +11,18 @@
         <tr>
           <th><abbr title="FieldName">Name</abbr></th>
           <th>Pos</th>
-          <th><abbr title="Primitive">Primitive</abbr></th>
+          <th><abbr title="Length">length</abbr></th>
+          <th><abbr title="Primitive">type</abbr></th>
           <th><abbr title="Operation">Op</abbr></th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <button class="button is-inverted is-small">add new field</button>
+          <td>
+            <button @click="addNewField" class="button is-inverted is-small">
+              add new field
+            </button>
+          </td>
         </tr>
       </tfoot>
       <tbody>
@@ -29,21 +34,17 @@
             <input class="input is-small" type="number" v-model="field.pos" />
           </td>
           <td>
+            <input
+              class="input is-small"
+              type="number"
+              v-model="field.length"
+            />
+          </td>
+          <td>
             <select class="input is-small">
-              <option>u8</option>
-              <option>i8</option>
-              <option>u16le</option>
-              <option>i16le</option>
-              <option>u16be</option>
-              <option>i16be</option>
-              <option>u32le</option>
-              <option>i32le</option>
-              <option>u32be</option>
-              <option>i32be</option>
-              <option>f32le</option>
-              <option>f32be</option>
-              <option>f64le</option>
-              <option>f64be</option>
+              <option :key="_type" v-for="_type in types">
+                {{ _type }}
+              </option>
             </select>
           </td>
           <td>
@@ -67,17 +68,44 @@ export default {
     return {
       schema: {
         type: "fields",
-        fields: [{}],
+        fields: [],
       },
       name: "",
     };
   },
   computed: {
+    types() {
+      return [
+        "bytes",
+        "u8",
+        "i8",
+        "u16le",
+        "i16le",
+        "u16be",
+        "i16be",
+        "u32le",
+        "i32le",
+        "u32be",
+        "i32be",
+        "f32le",
+        "f32be",
+        "f64le",
+        "f64be",
+      ];
+    },
     structured() {
       if (!this.dataView) {
         return {};
       }
       return {};
+    },
+  },
+  methods: {
+    _new_field() {
+      return { name: "", pos: 0, type: "bytes" };
+    },
+    addNewField() {
+      this.schema.fields.push(this._new_field());
     },
   },
 };
