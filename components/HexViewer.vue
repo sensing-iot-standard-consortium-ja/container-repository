@@ -54,7 +54,7 @@
       </div>
       <div class="interpreter" title="Data interpreter">
         <h2>Schema Interpreter</h2>
-        <SchemaEditor />
+        <SchemaEditor v-model="mode" />
         <!--
         <h2>Info</h2>
         <div class="offset">
@@ -70,6 +70,7 @@
           </div>
         </div>
         -->
+        <ModeSelector v-model="mode" />
         <h2>Data Interpreter</h2>
         <form class="settings">
           <div class="settings-row">
@@ -402,6 +403,7 @@ export default {
         binary: 0,
         hex: 0,
       },
+      mode: 0,
     };
   },
   watch: {
