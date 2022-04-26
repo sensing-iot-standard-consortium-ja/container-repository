@@ -48,7 +48,10 @@
             </select>
           </td>
           <td>
-            <button class="button is-inverted is-small is-danger">
+            <button
+              @click="removeField(idx)"
+              class="button is-inverted is-small is-danger"
+            >
               remove
             </button>
           </td>
@@ -106,6 +109,9 @@ export default {
     },
     addNewField() {
       this.schema.fields.push(this._new_field());
+    },
+    removeField(idx) {
+      this.schema.fields.splice(idx, 1);
     },
   },
 };
