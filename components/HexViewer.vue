@@ -71,8 +71,7 @@
         </div>
         -->
         <ModeSelector v-model="mode" />
-        <h2>Data Interpreter</h2>
-        <form class="settings">
+        <form class="settings" v-show="mode == 0">
           <div class="settings-row">
             <fieldset class="setting endian">
               <legend>Byte Order</legend>
@@ -121,6 +120,7 @@
             hexmode: settings.radixmode == 16,
             binmode: settings.radixmode == 2,
           }"
+          v-show="mode == 0"
         >
           <tr>
             <th>type</th>
