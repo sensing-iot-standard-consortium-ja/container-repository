@@ -23,24 +23,51 @@ export default {
       const data_id = Array.from(
         new Uint8Array(this.dataView.buffer).slice(5, _ptr)
       );
+      const attrs = [];
       if ([0x6666, 0x0f0f, 0x9999, 0xf0f0].includes(type)) {
         const attr_count = this.dataView.getUint8(_ptr);
         _ptr++;
         for (let i; i < attr_count; i++) {
-          // const attr_id = this.dataView.getUint8(_ptr)
+          const attr_id = this.dataView.getUint8(_ptr);
           const attr_len = this.dataView.getUint8(_ptr + 1);
-          // const attr_val = this.dataView.getXXXXX(_ptr + 2, attr_len)
+          const attr_val = Array.from(
+            new Uint8Array(this.dataView.buffer).slice(
+              _ptr + 2,
+              _ptr + 2 + attr_len
+            )
+          );
+          attrs.push([
+            { name: "id", value: attr_id, begin: _ptr, end: _ptr + 1 },
+            { name: "len", value: attr_len, begin: _ptr + 1, end: _ptr + 2 },
+            {
+              name: "value",
+              value: attr_val,
+              begin: _ptr + 2,
+              end: _ptr + 2 + attr_len,
+            },
+          ]);
           _ptr = _ptr + 1 + 1 + attr_len;
         }
       }
       return {
         header: { begin: 0, end: _ptr },
-        header_fields: {
-          type,
-          length,
-          data_index,
-          data_id,
-        },
+        header_fields: [
+          { name: "type", value: type, begin: 0, end: 2 },
+          { name: "length", value: length, begin: 2, end: 4 },
+          { name: "data_index", value: data_index, begin: 4, end: 5 },
+          {
+            name: "data_id",
+            value: data_id,
+            begin: 5,
+            end: 5 + _data_id_length,
+          },
+          {
+            name: "attributes",
+            value: [...attrs],
+            begin: 5 + _data_id_length,
+            end: _ptr,
+          },
+        ],
         payload: { begin: _ptr, end: length },
       };
     },

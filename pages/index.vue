@@ -1,7 +1,7 @@
 <template>
   <div>
     <DataLoader v-model="dataView" />
-    <HexViewer :dataView="dataView" />
+    <HexViewer :container="container" :dataView="dataView" />
     <IotContainer v-model="container" :dataView="dataView" />
   </div>
 </template>

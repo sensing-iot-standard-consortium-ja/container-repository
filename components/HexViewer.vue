@@ -71,6 +71,11 @@
         </div>
         -->
         <ModeSelector v-model="mode" />
+        <ContainerInterpreter
+          :container="container"
+          :dataView="dataView"
+          :v-show="mode == 1"
+        />
         <form class="settings" v-show="mode == 0">
           <div class="settings-row">
             <fieldset class="setting endian">
@@ -357,7 +362,7 @@
 <!--https://codepen.io/AzazelN28/pen/mQMapb -->
 <script>
 export default {
-  props: ["dataView"],
+  props: ["dataView", "container"],
   data() {
     return {
       rowLength: 16,
