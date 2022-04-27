@@ -1,6 +1,6 @@
 <template>
   <form @keydown.stop @submit.prevent>
-    <input type="text" v-model="name" />
+    <input type="text" v-model="schema.name" />
     <select v-model="schema.type">
       <option>fields</option>
       <option>json</option>
@@ -31,17 +31,23 @@
             <input class="input is-small" type="text" v-model="field.name" />
           </td>
           <td>
-            <input class="input is-small" type="number" v-model="field.pos" />
+            <input
+              class="input is-small"
+              type="number"
+              v-model.number="field.pos"
+            />
           </td>
           <td>
             <input
               class="input is-small"
               type="number"
-              v-model="field.length"
+              min="0"
+              v-model.number="field.length"
+              :disabled="field.type != 'bytes'"
             />
           </td>
           <td>
-            <select class="input is-small">
+            <select class="input is-small" v-model="field.type">
               <option :key="_type" v-for="_type in types">
                 {{ _type }}
               </option>
@@ -62,8 +68,9 @@
 </template>
 <script>
 export default {
+  props: ["dataView"],
   watch: {
-    dataView() {
+    structured() {
       this.$emit("input", this.structured);
     },
   },
@@ -72,8 +79,8 @@ export default {
       schema: {
         type: "fields",
         fields: [],
+        name: "",
       },
-      name: "",
     };
   },
   computed: {
@@ -100,12 +107,27 @@ export default {
       if (!this.dataView) {
         return {};
       }
-      return {};
+      switch (this.schema.type) {
+        case "fields":
+          return this.schema.fields.map((field) => {
+            return {
+              name: field.name,
+              value: "not impl",
+              begin: field.pos,
+              end: 0,
+            };
+          });
+        case "json":
+        case "cbor":
+          return [{ name: "未実装", value: "", begin: 0, end: -1 }];
+        default:
+          return [];
+      }
     },
   },
   methods: {
     _new_field() {
-      return { name: "", pos: 0, type: "bytes" };
+      return { name: "", pos: 0, length: 0, type: "bytes" };
     },
     addNewField() {
       this.schema.fields.push(this._new_field());

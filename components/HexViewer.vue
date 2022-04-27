@@ -54,7 +54,7 @@
       </div>
       <div class="interpreter" title="Data interpreter">
         <h2>Schema Interpreter</h2>
-        <SchemaEditor v-model="mode" />
+        <SchemaEditor v-model="structured" :dataView="dataView" />
         <!--
         <h2>Info</h2>
         <div class="offset">
@@ -74,6 +74,7 @@
         <ContainerInterpreter
           :container="container"
           :dataView="dataView"
+          :structured="structured"
           v-show="mode == 1"
         />
         <form class="settings" v-show="mode == 0">
@@ -409,6 +410,7 @@ export default {
         hex: 0,
       },
       mode: 0,
+      structured: [],
     };
   },
   watch: {
