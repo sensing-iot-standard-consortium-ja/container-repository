@@ -10,7 +10,7 @@
       <tr
         v-for="(header, idx) in headers"
         :key="idx"
-        @click="$emit(head.begin)"
+        @click="$emit('position', header.begin)"
       >
         <td>{{ header.name }}</td>
         <td>{{ header.value }}</td>

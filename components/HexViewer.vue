@@ -74,7 +74,7 @@
         <ContainerInterpreter
           :container="container"
           :dataView="dataView"
-          :v-show="mode == 1"
+          v-show="mode == 1"
         />
         <form class="settings" v-show="mode == 0">
           <div class="settings-row">
