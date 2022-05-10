@@ -68,7 +68,7 @@
 </template>
 <script>
 export default {
-  props: ["dataView"],
+  props: ["dataView", "container"],
   watch: {
     structured() {
       this.$emit("input", this.structured);
@@ -103,18 +103,47 @@ export default {
         "f64be",
       ];
     },
+    _dataview_mapping() {
+      return {
+        bytes: {}, // not implemented
+        u8: { get: "getUint8" },
+        i8: { get: "getInt8" },
+        u16le: { get: "getUint16", isLittle: true },
+        i16le: { get: "getInt16", isLittle: true },
+        u16be: { get: "getUint16" },
+        i16be: { get: "getInt16" },
+        u32le: { get: "getUint32", isLittle: true },
+        i32le: { get: "getInt32", isLittle: true },
+        u32be: { get: "getUint32" },
+        i32be: { get: "getInt32" },
+        f32le: { get: "getFloat32", isLittle: true },
+        f32be: { get: "getFloat32" },
+        f64le: { get: "getFloat64", isLittle: true },
+        f64be: { get: "getFloat64" },
+      };
+    },
     structured() {
       if (!this.dataView) {
         return {};
       }
+      if (!this.container) {
+        return {};
+      }
+      const _payload = this.container.payload;
+      const payload = Array.from(
+        new Uint8Array(this.dataView.buffer).slice(_payload.begin, _payload.end)
+      );
+
       switch (this.schema.type) {
         case "fields":
           return this.schema.fields.map((field) => {
+            const _begin = field.pos;
+            const _end = _begin + field.length;
             return {
               name: field.name,
-              value: "not impl",
-              begin: field.pos,
-              end: 0,
+              value: payload.slice(_begin, _end),
+              begin: _begin,
+              end: _end,
             };
           });
         case "json":
