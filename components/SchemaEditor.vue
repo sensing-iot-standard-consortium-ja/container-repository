@@ -43,8 +43,8 @@
               type="number"
               min="0"
               v-model.number="field.length"
-              :disabled="field.type != 'bytes'"
             />
+            <!--  :disabled="field.type != 'bytes'" -->
           </td>
           <td>
             <select class="input is-small" v-model="field.type">
@@ -67,6 +67,7 @@
   </form>
 </template>
 <script>
+import { Buffer } from "buffer";
 export default {
   props: ["dataView", "container"],
   watch: {
@@ -106,20 +107,48 @@ export default {
     _dataview_mapping() {
       return {
         bytes: {}, // not implemented
-        u8: { get: "getUint8" },
-        i8: { get: "getInt8" },
-        u16le: { get: "getUint16", isLittle: true },
-        i16le: { get: "getInt16", isLittle: true },
-        u16be: { get: "getUint16" },
-        i16be: { get: "getInt16" },
-        u32le: { get: "getUint32", isLittle: true },
-        i32le: { get: "getInt32", isLittle: true },
-        u32be: { get: "getUint32" },
-        i32be: { get: "getInt32" },
-        f32le: { get: "getFloat32", isLittle: true },
-        f32be: { get: "getFloat32" },
-        f64le: { get: "getFloat64", isLittle: true },
-        f64be: { get: "getFloat64" },
+        u8: (buf) => {
+          return new DataView(buf).getUint8(0);
+        },
+        i8: (buf) => {
+          return new DataView(buf).getInt8(0);
+        },
+        u16le: (buf) => {
+          return new DataView(buf).getUint16(0, true);
+        },
+        i16le: (buf) => {
+          return new DataView(buf).getInt16(0, true);
+        },
+        u16be: (buf) => {
+          return new DataView(buf).getUint16(0);
+        },
+        i16be: (buf) => {
+          return new DataView(buf).getInt16(0);
+        },
+        u32be: (buf) => {
+          return new DataView(buf).getUint32(0);
+        },
+        u32le: (buf) => {
+          return new DataView(buf).getUint32(0, true);
+        },
+        i32be: (buf) => {
+          return new DataView(buf).getInt32(0);
+        },
+        i32le: (buf) => {
+          return new DataView(buf).getInt32(0, true);
+        },
+        f32be: (buf) => {
+          return new DataView(buf).getFloat32(0);
+        },
+        f32le: (buf) => {
+          return new DataView(buf).getFloat32(0, true);
+        },
+        f64be: (buf) => {
+          return new DataView(buf).getFloat64(0);
+        },
+        f64le: (buf) => {
+          return new DataView(buf).getFloat64(0, true);
+        },
       };
     },
     structured() {
@@ -130,18 +159,36 @@ export default {
         return {};
       }
       const _payload = this.container.payload;
-      const payload = Array.from(
-        new Uint8Array(this.dataView.buffer).slice(_payload.begin, _payload.end)
+      const payload_buf = this.dataView.buffer.slice(
+        _payload.begin,
+        _payload.end
       );
+
+      // Array.from(
+      //   new Uint8Array(buffer.slice(_payload.begin, _payload.end)
+      // );
 
       switch (this.schema.type) {
         case "fields":
           return this.schema.fields.map((field) => {
             const _begin = field.pos;
             const _end = _begin + field.length;
+            const _buf = payload_buf.slice(_begin, _end);
+            const exec = this._dataview_mapping[field.type];
+            let _val;
+            if (typeof exec === "function") {
+              try {
+                _val = exec(_buf);
+              } catch (err) {
+                _val = "error";
+              }
+            } else {
+              _val = Array.from(new Uint8Array(_buf));
+            }
             return {
               name: field.name,
-              value: payload.slice(_begin, _end),
+              buffer: Buffer.from(_buf).toString("HEX"),
+              value: _val,
               begin: _begin,
               end: _end,
             };

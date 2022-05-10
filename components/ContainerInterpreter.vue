@@ -23,6 +23,7 @@
         <tr>
           <th><abbr title="FieldName">Name</abbr></th>
           <th><abbr title="Data">Data</abbr></th>
+          <th><abbr title="Raw">Raw</abbr></th>
         </tr>
       </thead>
       <tbody>
@@ -33,6 +34,7 @@
         >
           <td>{{ field.name }}</td>
           <td>{{ field.value }}</td>
+          <td>{{ field.buffer }}</td>
         </tr>
       </tbody>
     </table>

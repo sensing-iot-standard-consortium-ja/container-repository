@@ -9,6 +9,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "buffer": "^6.0.3",
     "bulma": "^0.9.3",
     "core-js": "^3.19.3",
     "express": "^4.17.3",
