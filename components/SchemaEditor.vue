@@ -43,13 +43,21 @@
               type="number"
               min="0"
               v-model.number="field.length"
+              :disabled="field.type != 'bytes'"
             />
-            <!--  :disabled="field.type != 'bytes'" -->
           </td>
           <td>
-            <select class="input is-small" v-model="field.type">
-              <option :key="_type" v-for="_type in types">
-                {{ _type }}
+            <select
+              class="input is-small"
+              v-model="field.type"
+              @change="updateLength(field)"
+            >
+              <option
+                :key="idx"
+                v-for="(_type, idx) in types"
+                :value="_type.name"
+              >
+                {{ _type.name }}
               </option>
             </select>
           </td>
@@ -87,21 +95,21 @@ export default {
   computed: {
     types() {
       return [
-        "bytes",
-        "u8",
-        "i8",
-        "u16le",
-        "i16le",
-        "u16be",
-        "i16be",
-        "u32le",
-        "i32le",
-        "u32be",
-        "i32be",
-        "f32le",
-        "f32be",
-        "f64le",
-        "f64be",
+        { name: "bytes", length: 1 },
+        { name: "u8", length: 1 },
+        { name: "i8", length: 1 },
+        { name: "u16le", length: 2 },
+        { name: "i16le", length: 2 },
+        { name: "u16be", length: 2 },
+        { name: "i16be", length: 2 },
+        { name: "u32le", length: 4 },
+        { name: "i32le", length: 4 },
+        { name: "u32be", length: 4 },
+        { name: "i32be", length: 4 },
+        { name: "f32le", length: 4 },
+        { name: "f32be", length: 4 },
+        { name: "f64le", length: 8 },
+        { name: "f64be", length: 8 },
       ];
     },
     _dataview_mapping() {
@@ -210,6 +218,11 @@ export default {
     },
     removeField(idx) {
       this.schema.fields.splice(idx, 1);
+    },
+    updateLength(field) {
+      const type_name = field.type;
+      const _type = this.types.find((e) => e.name == type_name);
+      field.length = _type.length;
     },
   },
 };
