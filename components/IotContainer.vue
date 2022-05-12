@@ -2,6 +2,7 @@
   <span style="visibility: hidden"></span>
 </template>
 <script>
+import { Buffer } from "buffer";
 export default {
   props: ["dataView"],
   watch: {
@@ -20,8 +21,11 @@ export default {
       const _data_id_length = this.data_id_length(data_index);
 
       let _ptr = 5 + _data_id_length;
-      const data_id = Array.from(
-        new Uint8Array(this.dataView.buffer).slice(5, _ptr)
+      // const data_id = Array.from(
+      //   new Uint8Array(this.dataView.buffer).slice(5, _ptr)
+      // );
+      const data_id = Buffer.from(this.dataView.buffer.slice(5, _ptr)).toString(
+        "hex"
       );
       const attrs = [];
       if ([0x6666, 0x0f0f, 0x9999, 0xf0f0].includes(type)) {
