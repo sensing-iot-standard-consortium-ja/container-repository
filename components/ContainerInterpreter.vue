@@ -34,7 +34,7 @@
         >
           <td>{{ field.name }}</td>
           <td>{{ field.value }}</td>
-          <td>{{ field.buffer }}</td>
+          <td class="raw">{{ field.buffer }}</td>
         </tr>
       </tbody>
     </table>
@@ -56,4 +56,8 @@ export default {
   },
 };
 </script>
-<style></style>
+<style>
+td.raw > span::before {
+  content: "0x";
+}
+</style>

@@ -1,11 +1,13 @@
 <template>
   <form @keydown.stop @submit.prevent>
+    <h2>Schema Interpreter</h2>
     <input type="text" v-model="schema.name" />
     <select v-model="schema.type">
       <option>fields</option>
       <option>json</option>
       <option>cbor</option>
     </select>
+    <button @click="register">save</button>
     <table class="table" v-if="schema.type == 'fields'">
       <thead>
         <tr>
@@ -212,6 +214,11 @@ export default {
   methods: {
     _new_field() {
       return { name: "", pos: 0, length: 0, type: "bytes" };
+    },
+    async register() {
+      const res = await fetch("/registry/health", { method: "GET" });
+      const body = await res.json();
+      console.log(body);
     },
     addNewField() {
       this.schema.fields.push(this._new_field());
