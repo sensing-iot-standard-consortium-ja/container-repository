@@ -216,8 +216,11 @@ export default {
       return { name: "", pos: 0, length: 0, type: "bytes" };
     },
     async register() {
-      const res = await fetch("/registry/health", { method: "GET" });
-      const body = await res.json();
+      const res = await fetch("/registry/hogehoge", {
+        method: "PUT",
+        body: "nekodaisuki",
+      });
+      const body = await res.blob();
       console.log(body);
     },
     addNewField() {
