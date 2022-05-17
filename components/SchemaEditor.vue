@@ -216,9 +216,16 @@ export default {
       return { name: "", pos: 0, length: 0, type: "bytes" };
     },
     async register() {
-      const res = await fetch("/registry/hogehoge", {
+      const { value: data_index } = this.container.header_fields.find(
+        (e) => e.name == "data_index"
+      );
+      const { value: data_id } = this.container.header_fields.find(
+        (e) => e.name == "data_id"
+      );
+      const schema_json = JSON.stringify(this.schema);
+      const res = await fetch(`/registry/repo/${data_index}/${data_id}`, {
         method: "PUT",
-        body: "nekodaisuki",
+        body: schema_json,
       });
       const body = await res.blob();
       console.log(body);
