@@ -4,8 +4,6 @@
     <input type="text" v-model="schema.name" />
     <select v-model="schema.type">
       <option>fields</option>
-      <option>json</option>
-      <option>cbor</option>
     </select>
     <button @click="register">save</button>
     <table class="table" v-if="schema.type == 'fields'">
@@ -177,10 +175,6 @@ export default {
         _payload.end
       );
 
-      // Array.from(
-      //   new Uint8Array(buffer.slice(_payload.begin, _payload.end)
-      // );
-
       switch (this.schema.type) {
         case "fields":
           return this.schema.fields.map((field) => {
@@ -206,9 +200,6 @@ export default {
               end: _end,
             };
           });
-        case "json":
-        case "cbor":
-          return [{ name: "未実装", value: "", begin: 0, end: -1 }];
         default:
           return [];
       }
