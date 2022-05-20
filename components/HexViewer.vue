@@ -1,6 +1,6 @@
 <template>
   <div id="app" tabIndex="1" @keydown="handleKey">
-    <div v-if="dataView" class="file">
+    <div class="file">
       <div class="offsets" title="Offset">
         <div
           v-for="(offset, lineIndex) of offsets"
@@ -53,7 +53,6 @@
         </div>
       </div>
       <div class="interpreter" title="Data interpreter">
-        <h2>Schema Interpreter</h2>
         <SchemaEditor
           v-model="structured"
           :dataView="dataView"
@@ -333,32 +332,34 @@
               <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
             </td>
           </tr>
-          <tr
-            v-if="settings.le"
-            class="tf32le"
-            title="32-bit little endian time (float 32)"
-          >
-            <td class="type">tf32le</td>
-            <td class="value">
-              {{ interpreter.tf32le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.be"
-            class="tf32be"
-            title="32-bit big endian time (float 32)"
-          >
-            <td class="type">tf32be</td>
-            <td class="value">
-              {{ interpreter.tf32be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
-            </td>
-          </tr>
+          <!--
+            <tr
+              v-if="settings.le"
+              class="tf32le"
+              title="32-bit little endian time (float 32)"
+            >
+              <td class="type">tf32le</td>
+              <td class="value">
+                {{ interpreter.tf32le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.be"
+              class="tf32be"
+              title="32-bit big endian time (float 32)"
+            >
+              <td class="type">tf32be</td>
+              <td class="value">
+                {{ interpreter.tf32be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
+              </td>
+            </tr>
+          -->
         </table>
       </div>
     </div>
@@ -632,8 +633,8 @@ export default {
       this.interpreter.u64le = 0;
       this.interpreter.u64be = 0;
       if (this.offset + 8 <= this.dataView.byteLength) {
-        this.interpreter.u64le = this.dataView.getUint64(this.offset, true);
-        this.interpreter.u64be = this.dataView.getUint64(this.offset, false);
+        this.interpreter.u64le = this.dataView.getBigUint64(this.offset, true);
+        this.interpreter.u64be = this.dataView.getBigUint64(this.offset, false);
         this.interpreter.f64le = this.dataView.getFloat64(this.offset, true);
         this.interpreter.f64be = this.dataView.getFloat64(this.offset, false);
       }

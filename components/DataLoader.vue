@@ -1,6 +1,5 @@
 <template lang="">
   <div
-    v-if="!value"
     class="drag"
     @drag="handleDrag"
     @dragstart="handleDrag"
@@ -20,12 +19,9 @@
           name="file"
           @change="handleOpenFile"
         />
-        <label class="open-file-label" for="file">
-          Drag and drop a file into this area or click here
-        </label>
+        <label class="open-file-label" for="file"> Load File </label>
       </div>
     </div>
-    <button @click="load_example">サンプルデータロード</button>
   </div>
 </template>
 <script>
@@ -78,24 +74,21 @@ export default {
 </script>
 <style>
 .drag {
+  position: fixed;
   background: #333;
   color: #bbb;
-  display: flex;
   align-items: center;
   justify-content: center;
+  bottom: 1em;
 }
 .drag .open-file {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16rem 2rem;
   border: 2px dashed #bbb;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
 }
-.drag .open-file label.open-file-label {
-  font-size: 2rem;
-  width: 100%;
-  height: 100%;
-  text-align: center;
+.drag .open-file-input {
+  display: none;
 }
 </style>

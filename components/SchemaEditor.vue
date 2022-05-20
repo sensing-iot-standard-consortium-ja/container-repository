@@ -84,6 +84,9 @@ export default {
     structured() {
       this.$emit("input", this.structured);
     },
+    container() {
+      this.fetch_schema_file();
+    },
   },
   data() {
     return {
@@ -229,6 +232,24 @@ export default {
       });
       const body = await res.blob();
       console.log(body);
+    },
+    async fetch_schema_file() {
+      const { value: data_index } = this.container.header_fields.find(
+        (e) => e.name == "data_index"
+      );
+      const { value: data_id } =
+        this.container.header_fields.find((e) => e.name == "data_id") | "_";
+      try {
+        const res = await fetch(`/registry/repo/${data_index}/${data_id}`);
+        this.schema = await res.json();
+      } catch {
+        this.schema = {
+          type: "fields",
+          fields: [],
+          name: "",
+        };
+        console.log("load default");
+      }
     },
     addNewField() {
       this.schema.fields.push(this._new_field());

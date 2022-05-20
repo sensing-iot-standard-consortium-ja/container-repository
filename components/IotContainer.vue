@@ -81,6 +81,12 @@ export default {
       const s_idx = idx.toString();
       const length_tbl = {
         0: 16,
+        1: 10,
+        2: 14,
+        3: 15,
+        4: 16,
+        5: 0,
+        6: 16,
       };
 
       return length_tbl[s_idx];

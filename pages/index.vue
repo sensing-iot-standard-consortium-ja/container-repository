@@ -7,22 +7,6 @@
 </template>
 
 <script>
-DataView.prototype.getUint64 = function (byteOffset, littleEndian) {
-  // split 64-bit number into two 32-bit (4-byte) parts
-  const left = this.getUint32(byteOffset, littleEndian);
-  const right = this.getUint32(byteOffset + 4, littleEndian);
-
-  // combine the two 32-bit values
-  const combined = littleEndian
-    ? left + 2 ** 32 * right
-    : 2 ** 32 * left + right;
-
-  if (!Number.isSafeInteger(combined)) {
-    console.warn(combined, "exceeds MAX_SAFE_INTEGER. Precision may be lost");
-  }
-
-  return combined;
-};
 export default {
   data() {
     return {
@@ -31,5 +15,18 @@ export default {
       schema: [],
     };
   },
+  mounted() {
+    const arrayBuffer = new ArrayBuffer(0x17);
+    const uint8 = new Uint8Array(arrayBuffer);
+    uint8.set(
+      [
+        0xaa, 0xaa, 0x00, 0x17, 0x00, 0xde, 0xad, 0xbe, 0xef, 0x00, 0x01, 0xaa,
+        0xaa, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x0e, 0x42,
+      ],
+      0
+    );
+    this.dataView = new DataView(arrayBuffer);
+  },
 };
 </script>
+<style></style>
