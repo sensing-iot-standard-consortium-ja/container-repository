@@ -1,7 +1,6 @@
 <template>
   <form @keydown.stop @submit.prevent>
     <h2>Schema Interpreter</h2>
-    <input type="text" v-model="schema.name" />
     <select v-model="schema.type">
       <option>fields</option>
     </select>
@@ -75,7 +74,6 @@
   </form>
 </template>
 <script>
-import { Buffer } from "buffer";
 export default {
   props: ["dataView", "container"],
   watch: {
@@ -98,69 +96,18 @@ export default {
   computed: {
     types() {
       return [
+        { name: "u8", length: 1, get: "getUint8", set: "setUint8" },
+        { name: "u16", length: 2, get: "getUint16", set: "setUint16" },
+        { name: "u32", length: 4, get: "getUint32", set: "setUint32" },
+        { name: "u64", length: 8, get: "getBigUint64", set: "setBigUint64" },
+        { name: "i8", length: 1, get: "getInt8", set: "setInt8" },
+        { name: "i16", length: 2, get: "getInt16", set: "setInt16" },
+        { name: "i32", length: 4, get: "getInt32", set: "setInt32" },
+        { name: "i64", length: 8, get: "getBigInt64", set: "setBigInt64" },
+        { name: "f32", length: 4, get: "getFloat32", set: "setFloat32" },
+        { name: "f64", length: 8, get: "getFloat64", set: "setFloat64" },
         { name: "bytes", length: 1 },
-        { name: "u8", length: 1 },
-        { name: "i8", length: 1 },
-        { name: "u16le", length: 2 },
-        { name: "i16le", length: 2 },
-        { name: "u16be", length: 2 },
-        { name: "i16be", length: 2 },
-        { name: "u32le", length: 4 },
-        { name: "i32le", length: 4 },
-        { name: "u32be", length: 4 },
-        { name: "i32be", length: 4 },
-        { name: "f32le", length: 4 },
-        { name: "f32be", length: 4 },
-        { name: "f64le", length: 8 },
-        { name: "f64be", length: 8 },
       ];
-    },
-    _dataview_mapping() {
-      return {
-        bytes: {}, // not implemented
-        u8: (buf) => {
-          return new DataView(buf).getUint8(0);
-        },
-        i8: (buf) => {
-          return new DataView(buf).getInt8(0);
-        },
-        u16le: (buf) => {
-          return new DataView(buf).getUint16(0, true);
-        },
-        i16le: (buf) => {
-          return new DataView(buf).getInt16(0, true);
-        },
-        u16be: (buf) => {
-          return new DataView(buf).getUint16(0);
-        },
-        i16be: (buf) => {
-          return new DataView(buf).getInt16(0);
-        },
-        u32be: (buf) => {
-          return new DataView(buf).getUint32(0);
-        },
-        u32le: (buf) => {
-          return new DataView(buf).getUint32(0, true);
-        },
-        i32be: (buf) => {
-          return new DataView(buf).getInt32(0);
-        },
-        i32le: (buf) => {
-          return new DataView(buf).getInt32(0, true);
-        },
-        f32be: (buf) => {
-          return new DataView(buf).getFloat32(0);
-        },
-        f32le: (buf) => {
-          return new DataView(buf).getFloat32(0, true);
-        },
-        f64be: (buf) => {
-          return new DataView(buf).getFloat64(0);
-        },
-        f64le: (buf) => {
-          return new DataView(buf).getFloat64(0, true);
-        },
-      };
     },
     structured() {
       if (!this.dataView) {
@@ -169,35 +116,41 @@ export default {
       if (!this.container) {
         return {};
       }
+      const buffer = this.dataView.buffer;
       const _payload = this.container.payload;
-      const payload_buf = this.dataView.buffer.slice(
+      const payloadDataView = new DataView(
+        buffer,
         _payload.begin,
-        _payload.end
+        _payload.end - _payload.begin
       );
-
       switch (this.schema.type) {
         case "fields":
           return this.schema.fields.map((field) => {
             const _begin = field.pos;
-            const _end = _begin + field.length;
-            const _buf = payload_buf.slice(_begin, _end);
-            const exec = this._dataview_mapping[field.type];
+            // const _end = _begin + field.length;
+            // const _buf = payload_buf.slice(_begin, _end); // これは理解不足による不適切なslice
+            const mapping = this.types.find((t) => t.name == field.type)?.[
+              "get"
+            ];
+            const isLittleEndian = field.tags.isLittleEndian | false;
             let _val;
-            if (typeof exec === "function") {
+            if (mapping) {
               try {
-                _val = exec(_buf);
+                _val = payloadDataView[mapping](_begin, isLittleEndian);
               } catch (err) {
                 _val = "error";
               }
-            } else {
-              _val = Array.from(new Uint8Array(_buf));
             }
+            const buffer = payloadDataView.buffer;
+            const offset = payloadDataView.byteOffset + field.pos;
+            const length = field.length;
+            const _hex = this.buf2hex(buffer, offset, length);
             return {
               name: field.name,
-              buffer: Buffer.from(_buf).toString("HEX"),
-              value: _val,
+              buffer: _hex,
+              value: _val | _hex,
               begin: _begin,
-              end: _end,
+              end: _begin + field.length,
             };
           });
         default:
@@ -207,14 +160,22 @@ export default {
   },
   methods: {
     _new_field() {
-      return { name: "", pos: 0, length: 0, type: "bytes" };
+      return { name: "", type: "bytes", pos: 0, length: 0, tags: {} };
+      // 本来適切にTypeScriptで定義するようなところ
+      /*
+        tags: key and default value
+          "isLittleEndian": false, // endian
+          "json:map": "${name}", //
+          "mapping": "",
+          "skip": ""
+      */
     },
     async register() {
       const { value: data_index } = this.container.header_fields.find(
-        (e) => e.name == "data_index"
+        (e) => e.name === "data_index"
       );
       const { value: data_id } = this.container.header_fields.find(
-        (e) => e.name == "data_id"
+        (e) => e.name === "data_id"
       );
       const schema_json = JSON.stringify(this.schema);
       const res = await fetch(`/registry/repo/${data_index}/${data_id}`, {
@@ -226,10 +187,12 @@ export default {
     },
     async fetch_schema_file() {
       const { value: data_index } = this.container.header_fields.find(
-        (e) => e.name == "data_index"
+        (e) => e.name === "data_index"
       );
-      const { value: data_id } =
-        this.container.header_fields.find((e) => e.name == "data_id") | "_";
+      const { value: data_id } = this.container.header_fields.find(
+        (e) => e.name === "data_id"
+      );
+
       try {
         const res = await fetch(`/registry/repo/${data_index}/${data_id}`);
         this.schema = await res.json();
@@ -252,6 +215,16 @@ export default {
       const type_name = field.type;
       const _type = this.types.find((e) => e.name == type_name);
       field.length = _type.length;
+    },
+    buf2hex(buffer, byteOffset, length) {
+      try {
+        // buffer is an ArrayBuffer
+        return [...new Uint8Array(buffer, byteOffset, length)]
+          .map((x) => x.toString(16).padStart(2, "0"))
+          .join("");
+      } catch (e) {
+        return "error";
+      }
     },
   },
 };

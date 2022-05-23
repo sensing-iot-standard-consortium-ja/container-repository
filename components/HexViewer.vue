@@ -131,208 +131,219 @@
           }"
           v-show="mode == 0"
         >
-          <tr>
-            <th>type</th>
-            <th>value</th>
-            <th @click="togglePreview">
-              <span class="show_hexmode">hex</span>
-              ↔️
-              <span class="show_binmode">binary</span>
-            </th>
-          </tr>
-          <tr v-if="settings.u" class="u8" title="8-bit unsigned int">
-            <td class="type">u8</td>
-            <td class="value">
-              {{ interpreter.u8 }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u8, 1) }}</span>
-            </td>
-          </tr>
-          <tr v-if="settings.i" class="i8" title="8-bit signed int">
-            <td class="type">i8</td>
-            <td class="value">
-              {{ interpreter.i8 }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u8, 1) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.u &amp;&amp; settings.le"
-            class="u16le"
-            title="16-bit little endian unsigned int"
-          >
-            <td class="type">u16le</td>
-            <td class="value">
-              {{ interpreter.u16le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u16le, 2) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.i &amp;&amp; settings.le"
-            class="i16le"
-            title="16-bit little endian signed int"
-          >
-            <td class="type">i16le</td>
-            <td class="value">
-              {{ interpreter.i16le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u16le, 2) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.u &amp;&amp; settings.be"
-            class="u16be"
-            title="16-bit big endian unsigned int"
-          >
-            <td class="type">u16be</td>
-            <td class="value">
-              {{ interpreter.u16be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u16be, 2) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.i &amp;&amp; settings.be"
-            class="i16be"
-            title="16-bit big endian signed int"
-          >
-            <td class="type">i16be</td>
-            <td class="value">
-              {{ interpreter.i16be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u16be, 2) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.u &amp;&amp; settings.le"
-            class="u32le"
-            title="32-bit little endian unsigned int"
-          >
-            <td class="type">u32le</td>
-            <td class="value">
-              {{ interpreter.u32le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.i &amp;&amp; settings.le"
-            class="i32le"
-            title="32-bit little endian signed int"
-          >
-            <td class="type">i32le</td>
-            <td class="value">
-              {{ interpreter.i32le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.u &amp;&amp; settings.be"
-            class="u32be"
-            title="32-bit big endian unsigned int"
-          >
-            <td class="type">u32be</td>
-            <td class="value">
-              {{ interpreter.u32be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.i &amp;&amp; settings.be"
-            class="i32be"
-            title="32-bit big endian signed int"
-          >
-            <td class="type">i32be</td>
-            <td class="value">
-              {{ interpreter.i32be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.le"
-            class="f32le"
-            title="32-bit little endian float"
-          >
-            <td class="type">f32le</td>
-            <td class="value">
-              {{ interpreter.f32le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
-            </td>
-          </tr>
-          <tr v-if="settings.be" class="f32be" title="32-bit big endian float">
-            <td class="type">f32be</td>
-            <td class="value">
-              {{ interpreter.f32be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.le"
-            class="f64le"
-            title="64-bit little endian float"
-          >
-            <td class="type">f64le</td>
-            <td class="value">
-              {{ interpreter.f64le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u64le, 8) }}</span>
-            </td>
-          </tr>
-          <tr v-if="settings.be" class="f64be" title="64-bit big endian float">
-            <td class="type">f64be</td>
-            <td class="value">
-              {{ interpreter.f64be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u64be, 8) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.le"
-            class="tu32le"
-            title="32-bit little endian time (unsigned int 32)"
-          >
-            <td class="type">tu32le</td>
-            <td class="value">
-              {{ interpreter.tu32le }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
-            </td>
-          </tr>
-          <tr
-            v-if="settings.be"
-            class="tu32be"
-            title="32-bit big endian time (unsigned int 32)"
-          >
-            <td class="type">tu32be</td>
-            <td class="value">
-              {{ interpreter.tu32be }}
-            </td>
-            <td class="raw">
-              <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
-            </td>
-          </tr>
-          <!--
+          <thead>
+            <tr>
+              <th>type</th>
+              <th>value</th>
+              <th @click="togglePreview">
+                <span class="show_hexmode">hex</span>
+                ↔️
+                <span class="show_binmode">binary</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="settings.u" class="u8" title="8-bit unsigned int">
+              <td class="type">u8</td>
+              <td class="value">
+                {{ interpreter.u8 }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u8, 1) }}</span>
+              </td>
+            </tr>
+            <tr v-if="settings.i" class="i8" title="8-bit signed int">
+              <td class="type">i8</td>
+              <td class="value">
+                {{ interpreter.i8 }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u8, 1) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.u &amp;&amp; settings.le"
+              class="u16le"
+              title="16-bit little endian unsigned int"
+            >
+              <td class="type">u16le</td>
+              <td class="value">
+                {{ interpreter.u16le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u16le, 2) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.i &amp;&amp; settings.le"
+              class="i16le"
+              title="16-bit little endian signed int"
+            >
+              <td class="type">i16le</td>
+              <td class="value">
+                {{ interpreter.i16le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u16le, 2) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.u &amp;&amp; settings.be"
+              class="u16be"
+              title="16-bit big endian unsigned int"
+            >
+              <td class="type">u16be</td>
+              <td class="value">
+                {{ interpreter.u16be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u16be, 2) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.i &amp;&amp; settings.be"
+              class="i16be"
+              title="16-bit big endian signed int"
+            >
+              <td class="type">i16be</td>
+              <td class="value">
+                {{ interpreter.i16be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u16be, 2) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.u &amp;&amp; settings.le"
+              class="u32le"
+              title="32-bit little endian unsigned int"
+            >
+              <td class="type">u32le</td>
+              <td class="value">
+                {{ interpreter.u32le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.i &amp;&amp; settings.le"
+              class="i32le"
+              title="32-bit little endian signed int"
+            >
+              <td class="type">i32le</td>
+              <td class="value">
+                {{ interpreter.i32le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.u &amp;&amp; settings.be"
+              class="u32be"
+              title="32-bit big endian unsigned int"
+            >
+              <td class="type">u32be</td>
+              <td class="value">
+                {{ interpreter.u32be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.i &amp;&amp; settings.be"
+              class="i32be"
+              title="32-bit big endian signed int"
+            >
+              <td class="type">i32be</td>
+              <td class="value">
+                {{ interpreter.i32be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.le"
+              class="f32le"
+              title="32-bit little endian float"
+            >
+              <td class="type">f32le</td>
+              <td class="value">
+                {{ interpreter.f32le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.be"
+              class="f32be"
+              title="32-bit big endian float"
+            >
+              <td class="type">f32be</td>
+              <td class="value">
+                {{ interpreter.f32be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.le"
+              class="f64le"
+              title="64-bit little endian float"
+            >
+              <td class="type">f64le</td>
+              <td class="value">
+                {{ interpreter.f64le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u64le, 8) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.be"
+              class="f64be"
+              title="64-bit big endian float"
+            >
+              <td class="type">f64be</td>
+              <td class="value">
+                {{ interpreter.f64be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u64be, 8) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.le"
+              class="tu32le"
+              title="32-bit little endian time (unsigned int 32)"
+            >
+              <td class="type">tu32le</td>
+              <td class="value">
+                {{ interpreter.tu32le }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32le, 4) }}</span>
+              </td>
+            </tr>
+            <tr
+              v-if="settings.be"
+              class="tu32be"
+              title="32-bit big endian time (unsigned int 32)"
+            >
+              <td class="type">tu32be</td>
+              <td class="value">
+                {{ interpreter.tu32be }}
+              </td>
+              <td class="raw">
+                <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
+              </td>
+            </tr>
+            <!--
             <tr
               v-if="settings.le"
               class="tf32le"
@@ -359,7 +370,7 @@
                 <span>{{ rawdata_presenter(interpreter.u32be, 4) }}</span>
               </td>
             </tr>
-          -->
+          --></tbody>
         </table>
       </div>
     </div>
