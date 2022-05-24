@@ -1,18 +1,17 @@
 <template>
   <form @keydown.stop @submit.prevent>
     <h2>Schema Interpreter</h2>
-    <select v-model="schema.type">
+    <select v-model="type">
       <option>fields</option>
     </select>
     <button @click="register">save</button>
-    <table class="table" v-if="schema.type == 'fields'">
+    <table class="table" v-if="type == 'fields'">
       <thead>
         <tr>
-          <th><abbr title="FieldName">Name</abbr></th>
-          <th>Pos</th>
-          <th><abbr title="Length">length</abbr></th>
-          <th><abbr title="Primitive">type</abbr></th>
-          <th><abbr title="Operation">Op</abbr></th>
+          <th><abbr title="OverView">OverView</abbr></th>
+          <th>Configuration</th>
+          <th>Tags</th>
+          <th>Ope</th>
         </tr>
       </thead>
       <tfoot>
@@ -25,47 +24,32 @@
         </tr>
       </tfoot>
       <tbody>
-        <tr :key="idx" v-for="(field, idx) in schema.fields">
+        <tr :key="idx" v-for="(field, idx) in fields">
+          <td>overview text</td>
           <td>
-            <input class="input is-small" type="text" v-model="field.name" />
+            <RichInput
+              :pos="field.pos"
+              :name="field.name"
+              :type="field.type"
+              :length="field.length"
+              @update:pos="(val) => (field.pos = val)"
+              @update:name="(val) => (field.name = val)"
+              @update:type="(val) => (field.type = val)"
+              @update:length="(val) => (field.length = val)"
+            ></RichInput>
           </td>
-          <td>
-            <input
-              class="input is-small"
-              type="number"
-              v-model.number="field.pos"
-            />
-          </td>
-          <td>
-            <input
-              class="input is-small"
-              type="number"
-              min="0"
-              v-model.number="field.length"
-              :disabled="field.type != 'bytes'"
-            />
-          </td>
-          <td>
-            <select
-              class="input is-small"
-              v-model="field.type"
-              @change="updateLength(field)"
-            >
-              <option
-                :key="idx"
-                v-for="(_type, idx) in types"
-                :value="_type.name"
-              >
-                {{ _type.name }}
-              </option>
-            </select>
-          </td>
+          <td>tags</td>
           <td>
             <button
+              class="button is-danger is-outlined is-small"
               @click="removeField(idx)"
-              class="button is-inverted is-small is-danger"
             >
-              remove
+              <span>Delete</span>
+              <span class="icon is-small">
+                <font-awesome-icon
+                  :icon="['fas', 'fa-times']"
+                ></font-awesome-icon>
+              </span>
             </button>
           </td>
         </tr>
@@ -86,14 +70,19 @@ export default {
   },
   data() {
     return {
-      schema: {
-        type: "fields",
-        fields: [],
-        name: "",
-      },
+      name: "",
+      type: "fields",
+      fields: [],
     };
   },
   computed: {
+    schema() {
+      return {
+        name: this.name,
+        type: this.type,
+        fields: this.fields,
+      };
+    },
     types() {
       return [
         { name: "u8", length: 1, get: "getUint8", set: "setUint8" },
@@ -123,9 +112,9 @@ export default {
         _payload.begin,
         _payload.end - _payload.begin
       );
-      switch (this.schema.type) {
+      switch (this.type) {
         case "fields":
-          return this.schema.fields.map((field) => {
+          return this.fields.map((field) => {
             const _begin = field.pos;
             // const _end = _begin + field.length;
             // const _buf = payload_buf.slice(_begin, _end); // これは理解不足による不適切なslice
@@ -195,26 +184,22 @@ export default {
 
       try {
         const res = await fetch(`/registry/repo/${data_index}/${data_id}`);
-        this.schema = await res.json();
+        const _res = { ...(await res.json()) };
+        this.name = _res?.name;
+        this.fields = _res?.fields;
+        this.type = _res?.type;
       } catch {
-        this.schema = {
-          type: "fields",
-          fields: [],
-          name: "",
-        };
+        this.type = "fields";
+        this.fields = [];
+        this.name = "";
         console.log("load default");
       }
     },
     addNewField() {
-      this.schema.fields.push(this._new_field());
+      this.fields.push(this._new_field());
     },
     removeField(idx) {
-      this.schema.fields.splice(idx, 1);
-    },
-    updateLength(field) {
-      const type_name = field.type;
-      const _type = this.types.find((e) => e.name == type_name);
-      field.length = _type.length;
+      this.fields.splice(idx, 1);
     },
     buf2hex(buffer, byteOffset, length) {
       try {

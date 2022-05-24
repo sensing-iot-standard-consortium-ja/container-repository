@@ -1,11 +1,11 @@
 <template>
-  <div class="dropdown" :class="{ 'is-active': show }">
+  <div class="dropdown" :class="{ 'is-hoverable': show }">
     <div class="dropdown-trigger">
       <button
         class="button is-small"
         aria-haspopup="true"
         aria-controls="dropdown-menu-id"
-        @click.prevent="show = !show"
+        @click.stop="show = !show"
       >
         <span>Configure</span>
         <span class="icon is-small">
@@ -25,8 +25,8 @@
               <input
                 class="input is-small"
                 type="text"
-                v-model="name"
-                required
+                :value="name"
+                @input.stop="(e) => $emit('update:name', e.target.value)"
               />
               <span class="icon is-small is-left">
                 <font-awesome-icon :icon="['fas', 'font']" />
@@ -42,7 +42,8 @@
                 class="input is-small"
                 type="number"
                 placeholder="position"
-                v-model.number="pos"
+                :value="pos"
+                @input.stop="(e) => $emit('update:pos', Number(e.target.value))"
               />
               <span class="icon is-small is-left">
                 <font-awesome-icon :icon="['fas', 'hashtag']" />
@@ -55,7 +56,10 @@
             <label class="label">Type/Length</label>
             <div class="control has-icons-left">
               <div class="select is-small is-fullwidth">
-                <select v-model="type">
+                <select
+                  :value="type"
+                  @input.stop="(e) => $emit('update:type', e.target.value)"
+                >
                   <option
                     :key="idx"
                     v-for="(_type, idx) in types"
@@ -69,12 +73,16 @@
                 <font-awesome-icon :icon="['fas', 'hashtag']" />
               </span>
             </div>
-            <div class="control has-icons-left" :disabled="type !== 'bytes'">
+            <div class="control has-icons-left">
               <input
                 class="input is-small"
                 type="number"
                 placeholder="length"
-                v-model.number="length"
+                :value="length"
+                @input.stop="
+                  (e) => $emit('update:length', Number(e.target.value))
+                "
+                :disabled="type !== 'bytes'"
               />
               <span class="icon is-small is-left">
                 <font-awesome-icon :icon="['fas', 'hashtag']" />
@@ -92,12 +100,15 @@ export default {
   data() {
     return {
       show: false,
-      name: "",
-      length: 0,
-      pos: 0,
-      type: "bytes",
     };
   },
+  props: {
+    name: String,
+    pos: Number,
+    length: Number,
+    type: String,
+  },
+  emits: ["update:pos", "update:name", "update:type", "update:length"],
   computed: {
     types() {
       return [
@@ -119,7 +130,7 @@ export default {
     type() {
       const type_name = this.type;
       const _type = this.types.find((e) => e.name == type_name);
-      this.length = _type.length;
+      this.$emit("update:length", _type.length);
     },
   },
 };
