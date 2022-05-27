@@ -7,7 +7,10 @@
         aria-controls="dropdown-menu-id"
         @click.stop="show = !show"
       >
-        <span>Configure</span>
+        <span
+          >{{ pos }}/{{ type
+          }}<span v-if="type == 'bytes'">({{ length }})</span></span
+        >
         <span class="icon is-small">
           <font-awesome-icon
             :icon="['fas', 'fa-angle-down']"
