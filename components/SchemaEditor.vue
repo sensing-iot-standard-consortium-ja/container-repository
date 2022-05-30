@@ -8,7 +8,7 @@
     <table class="table" v-if="type == 'fields'">
       <thead>
         <tr>
-          <th><abbr title="OverView">OverView</abbr></th>
+          <th><abbr>Name</abbr></th>
           <th>Configuration</th>
           <th>Tags</th>
           <th>Ope</th>
@@ -25,7 +25,7 @@
       </tfoot>
       <tbody>
         <tr :key="idx" v-for="(field, idx) in fields">
-          <td>overview text</td>
+          <td>{{ field.name }}</td>
           <td>
             <RichInput
               :pos="field.pos"
@@ -38,7 +38,13 @@
               @update:length="(val) => (field.length = val)"
             ></RichInput>
           </td>
-          <td>tags</td>
+          <td>
+            <TagInput
+              :tags="field.tags"
+              @update:tags="(val) => (field.tags = val)"
+            >
+            </TagInput>
+          </td>
           <td>
             <button
               class="button is-danger is-outlined is-small"
@@ -116,12 +122,10 @@ export default {
         case "fields":
           return this.fields.map((field) => {
             const _begin = field.pos;
-            // const _end = _begin + field.length;
-            // const _buf = payload_buf.slice(_begin, _end); // これは理解不足による不適切なslice
             const mapping = this.types.find((t) => t.name == field.type)?.[
               "get"
             ];
-            const isLittleEndian = field.tags.isLittleEndian | false;
+            const isLittleEndian = field?.tags?.isLittleEndian | false;
             let _val;
             if (mapping) {
               try {
