@@ -41,7 +41,12 @@
           <td>
             <TagInput
               :tags="field.tags"
-              @update:tags="(val) => (field.tags = val)"
+              @update:tags="
+                (val) => {
+                  field.tags = val;
+                  structured = structure();
+                }
+              "
             >
             </TagInput>
           </td>
@@ -72,6 +77,16 @@ export default {
     },
     container() {
       this.fetch_schema_file();
+      this.structured = this.structure();
+    },
+    fields: {
+      deep: true,
+      handler() {
+        this.structured = this.structure();
+      },
+    },
+    dataView() {
+      this.structured = this.structure();
     },
   },
   data() {
@@ -79,6 +94,7 @@ export default {
       name: "",
       type: "fields",
       fields: [],
+      structured: {},
     };
   },
   computed: {
@@ -104,7 +120,9 @@ export default {
         { name: "bytes", length: 1 },
       ];
     },
-    structured() {
+  },
+  methods: {
+    structure() {
       if (!this.dataView) {
         return {};
       }
@@ -125,7 +143,7 @@ export default {
             const mapping = this.types.find((t) => t.name == field.type)?.[
               "get"
             ];
-            const isLittleEndian = field?.tags?.isLittleEndian | false;
+            const isLittleEndian = field?.tags?.isLittleEndian || false;
             let _val;
             if (mapping) {
               try {
@@ -150,8 +168,7 @@ export default {
           return [];
       }
     },
-  },
-  methods: {
+
     _new_field() {
       return { name: "", type: "bytes", pos: 0, length: 0, tags: {} };
       // 本来適切にTypeScriptで定義するようなところ

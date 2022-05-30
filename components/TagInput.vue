@@ -27,7 +27,15 @@
                 type="text"
                 placeholder="TagName"
                 v-model="fieldname"
+                list="fieldnames"
               />
+              <datalist
+                id="fieldnames"
+                :key="idx"
+                v-for="(n, idx) in defined_field_names"
+              >
+                <option :value="n">{{ n }}</option>
+              </datalist>
               <span class="icon is-small is-left">
                 <font-awesome-icon :icon="['fas', 'font']" />
               </span>
@@ -99,6 +107,11 @@ export default {
       let _copy = Object.assign({}, this.tags);
       delete _copy[key];
       this.$emit("update:tags", _copy);
+    },
+  },
+  computed: {
+    defined_field_names() {
+      return ["isLittleEndian"];
     },
   },
 };
