@@ -15,6 +15,11 @@ export default {
       schema: [],
     };
   },
+  watch: {
+    dataView() {
+      this.container = null;
+    },
+  },
   mounted() {
     const arrayBuffer = new ArrayBuffer(0x17);
     const uint8 = new Uint8Array(arrayBuffer);

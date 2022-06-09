@@ -159,7 +159,7 @@ export default {
             return {
               name: field.name,
               buffer: _hex,
-              value: _val | _hex,
+              value: _val || _hex,
               begin: _begin,
               end: _begin + field.length,
             };
