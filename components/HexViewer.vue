@@ -52,7 +52,7 @@
           </div>
         </div>
       </div>
-      <div class="interpreter" title="Data interpreter">
+      <div class="interpreter">
         <SchemaEditor
           v-model="structured"
           :dataView="dataView"
@@ -73,7 +73,7 @@
           </div>
         </div>
         -->
-        <ModeSelector v-model="mode" />
+        <!-- <ModeSelector v-model="mode" v-show="false" /> -->
         <ContainerInterpreter
           :container="container"
           :dataView="dataView"
@@ -425,7 +425,7 @@ export default {
         binary: 0,
         hex: 0,
       },
-      mode: 0,
+      mode: 1,
       structured: [],
     };
   },

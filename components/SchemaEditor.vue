@@ -9,6 +9,10 @@
       <thead>
         <tr>
           <th><abbr>Name</abbr></th>
+          <th style="flex-direction: column">
+            <span class="tag is-primary is-light">Data</span><br />
+            <span class="tag is-info is-light">Raw</span>
+          </th>
           <th>Configuration</th>
           <th>Tags</th>
           <th>Ope</th>
@@ -26,6 +30,15 @@
       <tbody>
         <tr :key="idx" v-for="(field, idx) in fields">
           <td>{{ field.name }}</td>
+          <td>
+            <span class="tag is-primary is-light">
+              {{ structured[idx] ? structured[idx].value : "" }}
+            </span>
+            <br />
+            <span class="tag is-info is-light">{{
+              "0x" + (structured[idx] ? structured[idx].buffer : "")
+            }}</span>
+          </td>
           <td>
             <RichInput
               :pos="field.pos"

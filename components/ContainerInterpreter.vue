@@ -18,7 +18,7 @@
         </tr>
       </tbody>
     </table>
-    <table class="table is-hoverable is-fullwidth">
+    <!-- <table class="table is-hoverable is-fullwidth">
       <thead>
         <tr>
           <th><abbr title="FieldName">Name</abbr></th>
@@ -37,7 +37,7 @@
           <td class="raw">{{ field.buffer }}</td>
         </tr>
       </tbody>
-    </table>
+    </table> -->
   </div>
 </template>
 <script>
