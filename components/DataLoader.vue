@@ -74,6 +74,10 @@ export default {
 </script>
 <style>
 .drag {
+  top: 1em;
+  right: 1em;
+  z-index: 1;
+  height: 12px;
   position: fixed;
   background: #333;
   color: #bbb;
