@@ -5,7 +5,7 @@
       <option>fields</option>
     </select>
     <button @click="register">save</button>
-    <table class="table" v-if="type == 'fields'">
+    <table class="table is-hoverable is-fullwidth" v-if="type == 'fields'">
       <thead>
         <tr>
           <th><abbr>Name</abbr></th>
@@ -25,6 +25,10 @@
               add new field
             </button>
           </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
       </tfoot>
       <tbody>
