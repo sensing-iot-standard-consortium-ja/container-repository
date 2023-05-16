@@ -80,43 +80,6 @@ export default {
         current: 0,
       },
       column: 0,
-      settings: {
-        le: true,
-        be: true,
-        u: true,
-        i: true,
-        colorize: {
-          enabled: false,
-          palette: null,
-        },
-        radixmode: 16, // hex(16)/bin(2)
-      },
-      interpreter: {
-        u8: 0,
-        i8: 0,
-        u16le: 0,
-        i16le: 0,
-        u16be: 0,
-        i16be: 0,
-        u32le: 0,
-        i32le: 0,
-        u32be: 0,
-        i32be: 0,
-        f32le: 0,
-        f32be: 0,
-        u64be: 0,
-        i64be: undefined,
-        u64le: 0,
-        i64le: undefined,
-        f64le: 0,
-        f64be: 0,
-        tu32le: 0,
-        tu32be: 0,
-        tf32le: 0,
-        tf32be: 0,
-        binary: 0,
-        hex: 0,
-      },
       mode: 1,
       structured: [],
     };
@@ -126,7 +89,6 @@ export default {
       this.row.start = 0;
       this.row.current = 0;
       this.column = 0;
-      this.updateInterpreter();
     },
   },
   computed: {
@@ -174,19 +136,6 @@ export default {
     },
   },
   methods: {
-    togglePreview() {
-      if (this.settings.radixmode == 16) this.settings.radixmode = 2;
-      else {
-        this.settings.radixmode = 16;
-      }
-      return;
-    },
-    rawdata_presenter(value, bytelength) {
-      const keta = Math.ceil(
-        (bytelength * 8) / Math.log2(this.settings.radixmode)
-      );
-      return value.toString(this.settings.radixmode).padStart(keta, "0");
-    },
     getRows(fn) {
       if (!this.dataView) {
         return [];
@@ -214,7 +163,6 @@ export default {
     },
     moveCharLeft() {
       this.column = Math.max(0, this.column - 1);
-      this.updateInterpreter();
     },
     moveCharRight() {
       const newColumn = Math.min(this.rowLength - 1, this.column + 1);
@@ -222,7 +170,6 @@ export default {
       if (offset < this.dataView.byteLength) {
         this.column = newColumn;
       }
-      this.updateInterpreter();
     },
     moveLineUp() {
       this.row.current = Math.max(0, this.row.current - 1);
@@ -230,7 +177,6 @@ export default {
         this.row.start = this.row.current;
       }
       this.updateColumnToLine();
-      this.updateInterpreter();
     },
     moveLineDown() {
       this.row.current = Math.min(this.maxRows, this.row.current + 1);
@@ -238,19 +184,16 @@ export default {
         this.row.start = this.row.current - (this.rows - 1);
       }
       this.updateColumnToLine();
-      this.updateInterpreter();
     },
     movePageUp() {
       this.row.start = Math.max(0, this.row.start - this.rows);
       this.row.current = this.row.start;
       this.updateColumnToLine();
-      this.updateInterpreter();
     },
     movePageDown() {
       this.row.start = Math.min(this.maxStartRow, this.row.start + this.rows);
       this.row.current = this.row.start;
       this.updateColumnToLine();
-      this.updateInterpreter();
     },
     moveToStart() {
       this.row.current = this.row.start = 0;
@@ -274,80 +217,11 @@ export default {
     isLineActive(lineIndex) {
       return lineIndex === this.row.current - this.row.start;
     },
-    toTimestampString(number) {
-      try {
-        return new Date(number * 1000).toISOString();
-      } catch (error) {
-        // do nothing...
-        return "invalid timestamp";
-      }
-    },
-    updateInterpreter() {
-      this.interpreter.u8 = 0;
-      this.interpreter.i8 = 0;
-      if (this.offset + 1 <= this.dataView.byteLength) {
-        this.interpreter.u8 = this.dataView.getUint8(this.offset);
-        this.interpreter.i8 = this.dataView.getInt8(this.offset);
-      }
-
-      this.interpreter.u16le = 0;
-      this.interpreter.i16le = 0;
-      this.interpreter.u16be = 0;
-      this.interpreter.i16be = 0;
-      if (this.offset + 2 <= this.dataView.byteLength) {
-        this.interpreter.u16le = this.dataView.getUint16(this.offset, true);
-        this.interpreter.i16le = this.dataView.getInt16(this.offset, true);
-        this.interpreter.u16be = this.dataView.getUint16(this.offset, false);
-        this.interpreter.i16be = this.dataView.getInt16(this.offset, false);
-      }
-
-      this.interpreter.u32le = 0;
-      this.interpreter.i32le = 0;
-      this.interpreter.u32be = 0;
-      this.interpreter.i32be = 0;
-      this.interpreter.f32le = 0;
-      this.interpreter.f32be = 0;
-      this.interpreter.tu32le = 0;
-      this.interpreter.tu32be = 0;
-      this.interpreter.tf32le = 0;
-      this.interpreter.tf32be = 0;
-      if (this.offset + 4 <= this.dataView.byteLength) {
-        this.interpreter.u32le = this.dataView.getUint32(this.offset, true);
-        this.interpreter.i32le = this.dataView.getInt32(this.offset, true);
-        this.interpreter.u32be = this.dataView.getUint32(this.offset, false);
-        this.interpreter.i32be = this.dataView.getInt32(this.offset, false);
-        this.interpreter.f32le = this.dataView.getFloat32(this.offset, true);
-        this.interpreter.f32be = this.dataView.getFloat32(this.offset, false);
-        this.interpreter.tu32le = this.toTimestampString(
-          this.dataView.getUint32(this.offset, true)
-        );
-        this.interpreter.tu32be = this.toTimestampString(
-          this.dataView.getUint32(this.offset, false)
-        );
-        this.interpreter.tf32le = this.toTimestampString(
-          this.dataView.getFloat32(this.offset, true)
-        );
-        this.interpreter.tf32be = this.toTimestampString(
-          this.dataView.getFloat32(this.offset, false)
-        );
-      }
-      this.interpreter.f64le = 0;
-      this.interpreter.f64be = 0;
-      this.interpreter.u64le = 0;
-      this.interpreter.u64be = 0;
-      if (this.offset + 8 <= this.dataView.byteLength) {
-        this.interpreter.u64le = this.dataView.getBigUint64(this.offset, true);
-        this.interpreter.u64be = this.dataView.getBigUint64(this.offset, false);
-        this.interpreter.f64le = this.dataView.getFloat64(this.offset, true);
-        this.interpreter.f64be = this.dataView.getFloat64(this.offset, false);
-      }
-    },
     handleValueClick(valueIndex) {
       this.goToChar(valueIndex);
     },
     handleLineClick(lineIndex) {
       this.goToLineRelative(lineIndex);
-      this.updateInterpreter();
     },
     handleKey(e) {
       if (e.code === "ArrowUp" || e.key === "k") {
@@ -513,10 +387,6 @@ input[type="file"] {
   width: 100%;
   margin-bottom: 1rem;
 }
-.interpreter form .settings-row {
-  display: flex;
-  flex-direction: row;
-}
 .interpreter form .setting {
   display: flex;
   flex: 1 1 auto;
@@ -569,77 +439,5 @@ input[type="file"] {
 .interpreter table tr th:first-child {
   text-align: right;
   width: 0em;
-}
-.interpreter .u8 .type,
-.interpreter .i8 .type {
-  color: #c66;
-}
-.interpreter .u8 .value,
-.interpreter .i8 .value {
-  color: #df9f9f;
-}
-.interpreter .u16le .type,
-.interpreter .i16le .type {
-  color: #c96;
-}
-.interpreter .u16le .value,
-.interpreter .i16le .value {
-  color: #dfbf9f;
-}
-.interpreter .u16be .type,
-.interpreter .i16be .type {
-  color: #cc6;
-}
-.interpreter .u16be .value,
-.interpreter .i16be .value {
-  color: #dfdf9f;
-}
-.interpreter .u32le .type,
-.interpreter .i32le .type {
-  color: #9c6;
-}
-.interpreter .u32le .value,
-.interpreter .i32le .value {
-  color: #bfdf9f;
-}
-.interpreter .u32be .type,
-.interpreter .i32be .type {
-  color: #6c6;
-}
-.interpreter .u32be .value,
-.interpreter .i32be .value {
-  color: #9fdf9f;
-}
-.interpreter .f32le .type,
-.interpreter .f32be .type {
-  color: #6c9;
-}
-.interpreter .f32le .value,
-.interpreter .f32be .value {
-  color: #9fdfbf;
-}
-.interpreter .f64le .type,
-.interpreter .f64be .type {
-  color: #6cc;
-}
-.interpreter .f64le .value,
-.interpreter .f64be .value {
-  color: #9fdfdf;
-}
-.interpreter .tu32le .type,
-.interpreter .tu32be .type {
-  color: #69c;
-}
-.interpreter .tu32le .value,
-.interpreter .tu32be .value {
-  color: #9fbfdf;
-}
-.interpreter .tf32le .type,
-.interpreter .tf32be .type {
-  color: #7070c2;
-}
-.interpreter .tf32le .value,
-.interpreter .tf32be .value {
-  color: #a6a6d9;
 }
 </style>
