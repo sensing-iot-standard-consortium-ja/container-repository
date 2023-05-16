@@ -213,14 +213,13 @@ export default {
       console.log(body);
     },
     async fetch_schema_file() {
-      const { value: data_index } = this.container.header_fields.find(
-        (e) => e.name === "data_index"
-      );
-      const { value: data_id } = this.container.header_fields.find(
-        (e) => e.name === "data_id"
-      );
-
       try {
+        const { value: data_index } = this.container.header_fields.find(
+          (e) => e.name === "data_index"
+        );
+        const { value: data_id } = this.container.header_fields.find(
+          (e) => e.name === "data_id"
+        );
         const res = await fetch(`/registry/repo/${data_index}/${data_id}`);
         const _res = { ...(await res.json()) };
         this.name = _res?.name;
